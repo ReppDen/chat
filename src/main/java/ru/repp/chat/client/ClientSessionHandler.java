@@ -47,9 +47,9 @@ public class ClientSessionHandler extends IoHandlerAdapter {
 
                 case ChatCommand.QUIT:
 //                    callback.loggedOut();
-                    System.out.println("Session closed....");
+                    System.out.println("Session closed. You left the chat.");
                     session.close(true);
-                    break;
+                    System.exit(0);
             }
 
         } else {
