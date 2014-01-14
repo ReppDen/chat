@@ -31,9 +31,8 @@ public class ClientSessionHandler extends IoHandlerAdapter {
         String status = result[1];
         String theCommand = result[0];
         ChatCommand command = ChatCommand.valueOf(theCommand);
-        if ("OK".equals(status)) {
+        if (ChatCommand.OK_STATUS.equals(status)) {
             switch (command.toInt()) {
-
                 case ChatCommand.SEND:
                     if (result.length == 3) {
                         System.out.println(result[2]);
@@ -43,6 +42,7 @@ public class ClientSessionHandler extends IoHandlerAdapter {
                 case ChatCommand.LOGIN:
 //                    callback.loggedIn();
                     System.out.println("Login successfull!");
+                    System.out.println("[Hint] Type /help to get command list");
                     break;
 
                 case ChatCommand.QUIT:
@@ -53,7 +53,7 @@ public class ClientSessionHandler extends IoHandlerAdapter {
             }
 
         } else {
-            System.out.println("Server send an error! " + result[2]);
+            System.err.println("Server send an error! " + result[2]);
 //            if (result.length == 3) {
 //                callback.error(result[2]);
 //            }
@@ -63,6 +63,7 @@ public class ClientSessionHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
         System.out.println("error found!" + cause.toString());
+        cause.printStackTrace();
         session.close(true);
     }
 }
