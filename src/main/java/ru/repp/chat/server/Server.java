@@ -15,21 +15,45 @@ import java.nio.charset.Charset;
 /**
  * Сервер чата
  *
- * @author den
- * @since  1/12/14
+ * @author @Drepp
+ * @since 14.01.14
  */
 public class Server {
-    private static final int PORT = 9123;
 
-    private final static Logger LOG = LoggerFactory.getLogger((Server.class));
-    public static void main(String[] args) throws IOException {
-        LOG.info("Server started");
+    private static final int defaultPort = 9123;
+    private int port;
 
-        IoAcceptor acceptor = new NioSocketAcceptor();
-        acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName("UTF-8"))));
-        acceptor.setHandler(  new ServerChatMessageHandler() );
-        acceptor.getSessionConfig().setReadBufferSize( 2048 );
-        acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
-        acceptor.bind( new InetSocketAddress(PORT) );
+    private final static Logger LOG = LoggerFactory.getLogger((ServerApp.class));
+
+    IoAcceptor acceptor;
+
+    public Server() {
+        this(defaultPort);
+    }
+
+    public Server(int port) {
+        this.port = port;
+        acceptor = new NioSocketAcceptor();
+    }
+
+    public void start() {
+        try {
+            acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName("UTF-8"))));
+            acceptor.setHandler(  new ServerChatMessageHandler() );
+            acceptor.getSessionConfig().setReadBufferSize( 2048 );
+            acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
+            acceptor.bind( new InetSocketAddress(port));
+            LOG.info("Server started");
+        } catch (IOException ex) {
+            LOG.error("Server startup failed", ex);
+        }
+    }
+
+    public void stop() {
+        acceptor.unbind();
+    }
+
+    public boolean isServerActive() {
+        return acceptor.isActive();
     }
 }

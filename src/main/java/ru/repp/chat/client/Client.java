@@ -7,6 +7,7 @@ import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
+import ru.repp.chat.ChatCommand;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,30 +18,42 @@ import java.nio.charset.Charset;
 /**
  * Клиент чата
  *
- * @author den
- * @since 1/12/14
+ * @author @Drepp
+ * @since 14.01.14
  */
 public class Client {
-
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 9123;
     private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
 
-    public static void main(String[] args) throws IOException {
+
+    InputStreamReader inReader;
+    IoSession session;
+
+    public Client() {
+        this(HOSTNAME, PORT);
+    }
+
+    public Client(String host, int port) {
         NioSocketConnector connector = createConnector();
 
         // создаем сессию
-        ConnectFuture future = connector.connect(new InetSocketAddress(HOSTNAME, PORT));
+        ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
         future.awaitUninterruptibly();
-        IoSession session = future.getSession();
+        session = future.getSession();
 
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        inReader = new InputStreamReader(System.in);
+    }
+
+    public void start() throws IOException{
+        // инициализируем поток ввода
+        BufferedReader buffReader =  new BufferedReader(getInReader());
         System.out.println("Enter your name:");
-        String msg = br.readLine();
-        session.write("/login " + msg);
+        String msg = buffReader.readLine();
+        session.write(ChatCommand.LOGIN_CMD + " " + msg);
         while (true) {
             try {
-                msg = br.readLine();
+                msg = buffReader.readLine();
                 if (StringUtils.isNotBlank(msg)) {
                     session.write(msg);
                 }
@@ -50,8 +63,13 @@ public class Client {
             }
         }
 
+        stop();
+    }
+
+    public void stop() throws IOException {
+        session.close(true);
         System.out.println("Confirm exit");
-        br.readLine();
+        inReader.read();
     }
 
     /**
@@ -63,5 +81,13 @@ public class Client {
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.setHandler(new ClientSessionHandler());
         return connector;
+    }
+
+    public InputStreamReader getInReader() {
+        return inReader;
+    }
+
+    public void setInReader(InputStreamReader inReader) {
+        this.inReader = inReader;
     }
 }

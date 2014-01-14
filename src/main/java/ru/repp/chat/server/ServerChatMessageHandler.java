@@ -25,7 +25,7 @@ public class ServerChatMessageHandler extends IoHandlerAdapter {
             .synchronizedSet(new HashSet<String>());
 
 
-    private final static Logger LOG = LoggerFactory.getLogger((Server.class));
+    private final static Logger LOG = LoggerFactory.getLogger((ServerApp.class));
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
