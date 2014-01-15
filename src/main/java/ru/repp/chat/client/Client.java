@@ -22,6 +22,33 @@ import java.nio.charset.Charset;
  * @since 14.01.14
  */
 public class Client {
+
+    private class ClientThread implements Runnable {
+
+        public void run() {
+
+            try {
+                // инициализируем поток ввода
+                BufferedReader buffReader =  new BufferedReader(getInReader());
+                System.out.println("Enter your name:");
+                String msg = buffReader.readLine();
+                session.write(ChatCommand.LOGIN_CMD + " " + msg);
+                while (isConnected()) {
+                    try {
+                        msg = buffReader.readLine();
+                        if (StringUtils.isNotBlank(msg)) {
+                            session.write(msg);
+                        }
+                    } catch (RuntimeIoException e) {
+                        e.printStackTrace();
+                        break;
+                    }
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+            }
+        }
+    }
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 9123;
     private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
@@ -29,57 +56,47 @@ public class Client {
 
     InputStreamReader inReader;
     IoSession session;
+    Thread chat;
+
 
     public Client() {
-        this(HOSTNAME, PORT);
+        init();
     }
 
-    public Client(String host, int port) {
-        NioSocketConnector connector = createConnector();
+    public void start() throws InterruptedException {
+        chat = new Thread(new ClientThread());
+        chat.join();
 
-        // создаем сессию
-        ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
-        future.awaitUninterruptibly();
-        session = future.getSession();
-
-        inReader = new InputStreamReader(System.in);
-    }
-
-    public void start() throws IOException{
-        // инициализируем поток ввода
-        BufferedReader buffReader =  new BufferedReader(getInReader());
-        System.out.println("Enter your name:");
-        String msg = buffReader.readLine();
-        session.write(ChatCommand.LOGIN_CMD + " " + msg);
-        while (isConnected()) {
-            try {
-                msg = buffReader.readLine();
-                if (StringUtils.isNotBlank(msg)) {
-                    session.write(msg);
-                }
-            } catch (RuntimeIoException e) {
-                e.printStackTrace();
-                break;
-            }
-        }
     }
 
     public void stop() throws IOException {
+        if (chat.isAlive()) {
+            chat.stop();
+        }
         session.close(true);
         System.out.println("Confirm exit");
         inReader.read();
         inReader.close();
     }
 
+    private void init() {
+        init(HOSTNAME, PORT, new InputStreamReader(System.in));
+    }
     /**
      * создает и конфигурирует коннектор
      */
-    private static NioSocketConnector createConnector() {
+    private void init(String host, int port, InputStreamReader reader) {
         NioSocketConnector connector = new NioSocketConnector();
         connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.setHandler(new ClientSessionHandler());
-        return connector;
+        // создаем сессию
+        ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
+        future.awaitUninterruptibly();
+        session = future.getSession();
+
+        inReader = reader;
+
     }
 
     public InputStreamReader getInReader() {
