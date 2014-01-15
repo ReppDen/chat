@@ -49,7 +49,6 @@ public class ClientSessionHandler extends IoHandlerAdapter {
 //                    callback.loggedOut();
                     System.out.println("Session closed. You left the chat.");
                     session.close(true);
-                    System.exit(0);
             }
 
         } else {

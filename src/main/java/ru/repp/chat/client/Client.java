@@ -51,7 +51,7 @@ public class Client {
         System.out.println("Enter your name:");
         String msg = buffReader.readLine();
         session.write(ChatCommand.LOGIN_CMD + " " + msg);
-        while (true) {
+        while (isConnected()) {
             try {
                 msg = buffReader.readLine();
                 if (StringUtils.isNotBlank(msg)) {
@@ -62,14 +62,13 @@ public class Client {
                 break;
             }
         }
-
-        stop();
     }
 
     public void stop() throws IOException {
         session.close(true);
         System.out.println("Confirm exit");
         inReader.read();
+        inReader.close();
     }
 
     /**
@@ -89,5 +88,9 @@ public class Client {
 
     public void setInReader(InputStreamReader inReader) {
         this.inReader = inReader;
+    }
+
+    public boolean isConnected() {
+        return session.isConnected();
     }
 }

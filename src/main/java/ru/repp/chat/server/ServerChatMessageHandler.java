@@ -30,7 +30,7 @@ public class ServerChatMessageHandler extends IoHandlerAdapter {
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         LOG.error("exceptionCaught", cause);
-        session.close(true);
+        cause.printStackTrace();
     }
 
     @Override
@@ -55,7 +55,7 @@ public class ServerChatMessageHandler extends IoHandlerAdapter {
 
                 case ChatCommand.QUIT:
                     session.write(ChatCommand.QUIT_CMD + " " + ChatCommand.OK_STATUS);
-                    session.close(true);
+//                    session.close(true);
                     break;
                 case ChatCommand.LOGIN:
                     // проверим имя на занятость
