@@ -11,8 +11,11 @@ import org.junit.Test;
  */
 public class ServerTest {
 
+    /**
+     * тест запуска сервера
+     */
     @Test
-    public void serverStartupTest() throws Exception{
+    public void serverStartupTest() {
         Server s = new Server();
         Assert.assertFalse(s.isServerActive());
 
@@ -21,6 +24,6 @@ public class ServerTest {
 
         s.stop();
         Assert.assertFalse(s.isServerActive());
-
     }
+
 }

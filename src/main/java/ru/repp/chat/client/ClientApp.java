@@ -12,7 +12,7 @@ import java.io.IOException;
 public class ClientApp {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        Client c = new Client();
+        ClientOld c = new ClientOld();
         c.setInReader(new FileReader("src/test/resources/client/simple.txt"));
         c.start();
     }

@@ -2,6 +2,7 @@ package ru.repp.chat.server;
 
 import org.apache.mina.core.service.IoAcceptor;
 import org.apache.mina.core.session.IdleStatus;
+import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
@@ -53,7 +54,28 @@ public class Server {
         acceptor.unbind();
     }
 
+    /**
+     * @return индикатор активности сервера
+     */
     public boolean isServerActive() {
         return acceptor.isActive();
+    }
+
+    /**
+     * @return количество подключенных сессий
+     */
+    public int getSessionsCount() {
+        return acceptor.getManagedSessionCount();
+    }
+
+    /**
+     * @return количество авторизованых клиентов
+     */
+    public int getAuthorizedClientsCount() {
+        int count = 0;
+        for (IoSession s :acceptor.getManagedSessions().values()) {
+            count += s.getAttribute("user") != null ? 1 : 0;
+        }
+        return count;
     }
 }

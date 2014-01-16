@@ -1,4 +1,4 @@
-package ru.repp.chat;
+package ru.repp.chat.utils;
 
 /**
  * Здесь будет ваша реклама

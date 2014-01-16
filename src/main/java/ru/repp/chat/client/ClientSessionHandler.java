@@ -2,7 +2,7 @@ package ru.repp.chat.client;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
-import ru.repp.chat.ChatCommand;
+import ru.repp.chat.utils.ChatCommand;
 
 /**
 * Здесь будет ваша реклама
@@ -36,17 +36,17 @@ public class ClientSessionHandler extends IoHandlerAdapter {
                 case ChatCommand.SEND:
                     if (result.length == 3) {
                         System.out.println(result[2]);
-//                        callback.messageReceived(result[2]);
+//                        messageHandler.messageReceived(result[2]);
                     }
                     break;
                 case ChatCommand.LOGIN:
-//                    callback.loggedIn();
+//                    messageHandler.loggedIn();
                     System.out.println("Login successfull!");
                     System.out.println("[Hint] Type /help to get command list");
                     break;
 
                 case ChatCommand.QUIT:
-//                    callback.loggedOut();
+//                    messageHandler.loggedOut();
                     System.out.println("Session closed. You left the chat.");
                     session.close(true);
             }
@@ -54,7 +54,7 @@ public class ClientSessionHandler extends IoHandlerAdapter {
         } else {
             System.err.println("Server send an error! " + result[2]);
 //            if (result.length == 3) {
-//                callback.error(result[2]);
+//                messageHandler.error(result[2]);
 //            }
         }
     }
