@@ -16,6 +16,7 @@ import java.util.Set;
  * @author den
  * @since 1/12/14
  */
+@Deprecated
 public class ServerChatMessageHandler extends IoHandlerAdapter {
 
     private final Set<IoSession> sessions = Collections

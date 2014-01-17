@@ -10,6 +10,7 @@ import ru.repp.chat.utils.ChatCommand;
 * @author den
 * @since 1/12/14
 */
+@Deprecated
 public class ClientSessionHandler extends IoHandlerAdapter {
 
     public ClientSessionHandler() {

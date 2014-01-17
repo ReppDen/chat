@@ -4,9 +4,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.repp.chat.server.Server;
 
-import java.io.FileReader;
-import java.io.IOException;
-
 /**
  * Тесты для клиента
  *
@@ -15,6 +12,7 @@ import java.io.IOException;
  */
 public class ClientTest {
 
+    private static final int TIMEOUT = 3000;
     /**
      * тест тоединения с сервером
      */
@@ -77,6 +75,7 @@ public class ClientTest {
             c.stop();
         }
 
+        sleep();
         Assert.assertEquals(s.getSessionsCount(),0);
 
         s.stop();
@@ -90,9 +89,12 @@ public class ClientTest {
         Client c = new Client();
         c.connect();
 
-        c.login("Den");
+        String user = "Den";
+        c.login(user);
 
         Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
+
+        Assert.assertEquals(c.getUserName(), user);
 
         c.stop();
 
@@ -100,37 +102,109 @@ public class ClientTest {
     }
 
     @Test
-    public void testSendCmd() throws Exception {
+    public void testDoubleLogin() throws Exception {
         Server s = startServer();
 
         Client c = new Client();
-//        FileReader f = new FileReader("src/test/resources/client/simple.txt");
-
         c.connect();
 
-//        c.sendCmd(Command.SEND, "hi");
+        String[] users = new String [] {"Den", "Vasya"};
 
-        // TODO
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
+        for (String user : users) {
+            c.login(user);
+        }
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
+
+        Assert.assertEquals(c.getUserName(), users[0]);
+
+        sleep();
+        c.stop();
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
 
         stopServer(s);
-
     }
 
+    private void sleep() {
+        try {
+            Thread.sleep(TIMEOUT);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Test
-    public void test100Client() throws IOException, InterruptedException {
+    public void testFewClientsLogin() throws Exception {
         Server s = startServer();
-        ClientOld[] cl = new ClientOld[100];
-        for (int i = 0; i < cl.length; i++) {
-            cl[i] = new ClientOld();
-            cl[i].setInReader(new FileReader("src/test/resources/client/simple2.txt"));
-            Assert.assertTrue(cl[i].isConnected());
-            cl[i].start();
-            Assert.assertFalse(cl[i].isConnected());
+
+        int n = 3;
+        String baseName = "Den";
+        Client[] clients = new Client[n];
+
+
+        Assert.assertEquals(s.getSessionsCount(), 0);
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
+        for (int i = 0; i < clients.length; i++) {
+            clients[i] = new Client();
+            clients[i].connect();
+            clients[i].login(baseName + i);
+        }
+
+        Assert.assertEquals(s.getSessionsCount(), n);
+        Assert.assertEquals(s.getAuthorizedClientsCount(), n);
+
+        for (int i = 0; i < clients.length; i++) {
+            Assert.assertEquals(clients[i].getUserName(), baseName + i);
+            clients[i].stop();
         }
 
         stopServer(s);
     }
+
+    @Test
+    public void testSameNameClientsLogin() throws Exception {
+        Server s = startServer();
+
+        Client c = new Client();
+        c.connect();
+
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
+        String user = "Den";
+        c.login(user);
+
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
+
+        Client c2 = new Client();
+        c.login(user);
+
+        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
+
+        Assert.assertEquals(c.getUserName(), user);
+        Assert.assertNull(c2.getUserName());
+
+        c.stop();
+
+        stopServer(s);
+    }
+
+    @Test
+    public void testQuitCmd() throws Exception {
+        Server s = startServer();
+
+        Client c = new Client();
+        c.connect();
+        Assert.assertEquals(s.getSessionsCount(), 1);
+
+        c.quit();
+//
+//        Assert.assertEquals(s.getSessionsCount(), 0);
+
+//        Assert.assertFalse(c.isConnected());
+        c.stop();
+        stopServer(s);
+
+    }
+
     /**
      * иницилизирует новый сервер
      * @return

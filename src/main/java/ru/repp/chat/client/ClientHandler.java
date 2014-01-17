@@ -4,6 +4,7 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Response;
+import ru.repp.chat.utils.ResponseHandler;
 
 /**
 * обработчик сетевого взаимодействия клиента
@@ -14,9 +15,9 @@ import ru.repp.chat.utils.Response;
 public class ClientHandler extends IoHandlerAdapter {
 
 
-    MessageHandler messageHandler;
-    public ClientHandler(MessageHandler messageHandler) {
-        this.messageHandler = messageHandler;
+    ResponseHandler responseHandler;
+    public ClientHandler(ResponseHandler responseHandler) {
+        this.responseHandler = responseHandler;
     }
     @Override
     public void sessionOpened(IoSession session) {
@@ -30,34 +31,18 @@ public class ClientHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message) {
         String completeMsg = (String) message;
-        String[] parts = completeMsg.split(" ", 2);
+        String[] parts = completeMsg.split(" ", 3);
         String command = parts[0];
         String status = parts[1];
+        String value = parts.length > 2 ? parts[2] : "";
 
         Command cmd = Command.formString(command);
 
         if (Response.OK.toString().equals(status)) {
             // комманда успешно обработана
-//            switch (cmd) {
-//                case SEND: {
-//                    break;
-//                }
-//                case LOGIN: {
-//                    break;
-//                }
-//                case QUIT: {
-//                    break;
-//                }
-//                case HELP: {
-//                    break;
-//                }
-//                case LIST: {
-//                    break;
-//                }
-//            }
-            messageHandler.messageReceived(cmd, status);
+            responseHandler.messageReceived(session, cmd, value);
         } else {
-            messageHandler.error(status);
+            responseHandler.error(value);
         }
 
     }
