@@ -27,6 +27,7 @@ public class SystemOutMessageHandler implements ResponseHandler {
             }
             case QUIT: {
                 System.out.println("Session closed. You left the chat.");
+                session.close(true);
                 break;
             }
             case HELP: {

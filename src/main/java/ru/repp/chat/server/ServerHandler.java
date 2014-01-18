@@ -62,7 +62,7 @@ public class ServerHandler extends IoHandlerAdapter {
 
                 // проверить на повторный логин
                 if (user != null) {
-                    session.write(ChatCommand.LOGIN_CMD + " Error! You already logged in as " + user);
+                    sendCustomCmd(session,Command.LOGIN, Response.ERROR, "Error! You already logged in as " + user);
                     return;
                 }
 
@@ -73,16 +73,16 @@ public class ServerHandler extends IoHandlerAdapter {
                 session.setAttribute("user", user);
 
                 users.add(user);
-                session.write(ChatCommand.LOGIN_CMD + " " + ChatCommand.OK_STATUS + " " + user);
+                sendCustomCmd(session,Command.LOGIN, Response.OK, user);
                 broadcast("User " + user + " has joined the chat.");
                 break;
             }
             case QUIT: {
-                session.write(ChatCommand.QUIT_CMD + " " + ChatCommand.OK_STATUS);
+                sendCustomCmd(session,Command.QUIT, Response.OK, "");
                 break;
             }
             case HELP: {
-                System.out.println("Nice try, LOL!");
+                sendCustomCmd(session,Command.HELP, Response.OK, "Nice try, LOL!");
                 break;
             }
             case LIST: {

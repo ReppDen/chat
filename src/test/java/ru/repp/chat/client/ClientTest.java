@@ -4,6 +4,8 @@ import org.junit.Assert;
 import org.junit.Test;
 import ru.repp.chat.server.Server;
 
+import java.io.OutputStreamWriter;
+
 /**
  * Тесты для клиента
  *
@@ -87,10 +89,12 @@ public class ClientTest {
         Server s = startServer();
 
         Client c = new Client();
+        OutputStreamWriter writer = new OutputStreamWriter(System.out);
+//        c.setResponseHandler(new BuffReaderMessageHandler(writer));
         c.connect();
 
         String user = "Den";
-        c.login(user);
+        String resp = c.login(user);
 
         Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
 
@@ -193,11 +197,12 @@ public class ClientTest {
 
         Client c = new Client();
         c.connect();
+        c.login("Den");
         Assert.assertEquals(s.getSessionsCount(), 1);
 
         c.quit();
 //
-//        Assert.assertEquals(s.getSessionsCount(), 0);
+        Assert.assertEquals(s.getSessionsCount(), 0);
 
 //        Assert.assertFalse(c.isConnected());
         c.stop();

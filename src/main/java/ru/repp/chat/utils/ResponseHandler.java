@@ -8,7 +8,7 @@ import org.apache.mina.core.session.IoSession;
  */
 public interface ResponseHandler {
 
-    public void error(String status);
+    public void error(String msg) ;
 
-    public void messageReceived(IoSession session, Command cmd, String status);
+    public void messageReceived(IoSession session, Command cmd, String value) ;
 }
