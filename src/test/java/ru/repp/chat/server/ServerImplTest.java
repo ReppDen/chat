@@ -9,14 +9,14 @@ import org.junit.Test;
  * @author @Drepp
  * @since 14.01.14
  */
-public class ServerTest {
+public class ServerImplTest {
 
     /**
      * тест запуска сервера
      */
     @Test
     public void serverStartupTest() {
-        Server s = new Server();
+        Server s = new ServerImpl();
         Assert.assertFalse(s.isServerActive());
 
         s.start();

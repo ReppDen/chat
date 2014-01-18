@@ -4,9 +4,9 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ru.repp.chat.utils.ChatCommand;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Response;
+import ru.repp.chat.utils.Utils;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -56,13 +56,13 @@ public class ServerHandler extends IoHandlerAdapter {
 
                 // проверим имя на занятость
                 if (users.contains(value)) {
-                    sendCustomCmd(session,Command.LOGIN, Response.ERROR, "Error! Name " + user + " already in use!");
+                    session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.ERROR, "Error! Name " + user + " already in use!"));
                     return;
                 }
 
                 // проверить на повторный логин
                 if (user != null) {
-                    sendCustomCmd(session,Command.LOGIN, Response.ERROR, "Error! You already logged in as " + user);
+                    session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.ERROR, "Error! You already logged in as " + user));
                     return;
                 }
 
@@ -73,19 +73,20 @@ public class ServerHandler extends IoHandlerAdapter {
                 session.setAttribute("user", user);
 
                 users.add(user);
-                sendCustomCmd(session,Command.LOGIN, Response.OK, user);
+                session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user));
                 broadcast("User " + user + " has joined the chat.");
                 break;
             }
             case QUIT: {
-                sendCustomCmd(session,Command.QUIT, Response.OK, "");
+                session.write(Utils.makeCustomServerCmd(Command.QUIT, Response.OK, ""));
                 break;
             }
             case HELP: {
-                sendCustomCmd(session,Command.HELP, Response.OK, "Nice try, LOL!");
+                session.write(Utils.makeCustomServerCmd(Command.HELP, Response.OK, "Nice try, LOL!"));
                 break;
             }
             case LIST: {
+                session.write(Utils.makeCustomServerCmd(Command.HELP, Response.OK, "Here comes Users list"));
                 break;
             }
             case SEND: default: {
@@ -104,7 +105,7 @@ public class ServerHandler extends IoHandlerAdapter {
         synchronized (sessions) {
             for (IoSession session : sessions) {
                 if (session.isConnected()) {
-                    session.write(ChatCommand.SEND_CMD + " " + ChatCommand.OK_STATUS +  " " + message);
+                    session.write(Utils.makeCustomServerCmd(Command.SEND, Response.OK, message));
                 }
             }
         }
@@ -118,12 +119,5 @@ public class ServerHandler extends IoHandlerAdapter {
         broadcast("User " + user + " has left the chat");
     }
 
-    /**
-     * посылает указанную комманду серверу
-     * @param cmd комманда
-     * @param arg аргумент
-     */
-    public void sendCustomCmd(IoSession session, Command cmd, Response response, Object arg) {
-        session.write(cmd.toString() + " " + response.toString() + " " + arg.toString());
-    }
+
 }

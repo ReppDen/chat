@@ -12,9 +12,6 @@ import java.io.IOException;
 public class ClientApp {
 
     public static void main(String[] args) throws IOException, InterruptedException {
-        ClientOld c = new ClientOld();
-        c.setInReader(new FileReader("src/test/resources/client/simple.txt"));
-        c.start();
     }
 
 

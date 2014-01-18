@@ -1,10 +1,16 @@
 package ru.repp.chat.client;
 
+import org.hamcrest.CoreMatchers;
+import org.junit.After;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import ru.repp.chat.server.Server;
+import ru.repp.chat.server.ServerMock;
+import ru.repp.chat.utils.Command;
+import ru.repp.chat.utils.Utils;
 
-import java.io.OutputStreamWriter;
+import java.nio.channels.UnresolvedAddressException;
 
 /**
  * Тесты для клиента
@@ -14,213 +20,140 @@ import java.io.OutputStreamWriter;
  */
 public class ClientTest {
 
-    private static final int TIMEOUT = 3000;
-    /**
-     * тест тоединения с сервером
-     */
-    @Test
-    public void testClientConnection() {
-        Server s = startServer();
+    private static final String HOSTNAME = "localhost";
+    private static final int PORT = 9123;
 
+    Server server;
+
+    @Before
+    public void startServer() {
+        server = new ServerMock(PORT);
+        server.start();
+    }
+
+    @After
+    public void stopServer() {
+        this.server.stop();
+    }
+
+    @Test
+    public void testConnect() {
         Client c = new Client();
         Assert.assertFalse(c.isConnected());
-        c.connect();
-
+        c.connect(HOSTNAME, PORT);
         Assert.assertTrue(c.isConnected());
-
+        // cообщений не отправляллось
+        Assert.assertEquals(server.getHistoryManager().getCount(), 0);
         c.stop();
-        stopServer(s);
+        Assert.assertFalse(c.isConnected());
     }
 
-    /**
-     * тест переподключения к серверу одним клиентом
-     */
     @Test
-    public void testReconnect() {
-        Server s = startServer();
-
+    public void testStop() {
         Client c = new Client();
         Assert.assertFalse(c.isConnected());
-        c.connect();
-
+        c.stop();
+        Assert.assertFalse(c.isConnected());
+        c.connect(HOSTNAME, PORT);
         Assert.assertTrue(c.isConnected());
-
         c.stop();
         Assert.assertFalse(c.isConnected());
+    }
 
-        c.connect();
-        Assert.assertTrue(c.isConnected());
-
-        c.stop();
+    @Test
+    public void testConnectFail() {
+        Client c = new Client();
         Assert.assertFalse(c.isConnected());
 
-        stopServer(s);
-    }
-
-    /**
-     * подключение нескольких клиентов
-     * @throws Exception
-     */
-    @Test
-    public void testFewClients() throws Exception {
-        Server s = startServer();
-        int n = 3;
-        Client[] clients = new Client[n];
-        for (int i = 0; i < clients.length; i++) {
-            clients[i] = new Client();
-            clients[i].connect();
-        }
-
-        Assert.assertEquals(s.getSessionsCount(),3);
-
-        for (Client c : clients) {
-            c.stop();
-        }
-
-        sleep();
-        Assert.assertEquals(s.getSessionsCount(),0);
-
-        s.stop();
-
-    }
-
-    @Test
-    public void testLogin() throws Exception {
-        Server s = startServer();
-
-        Client c = new Client();
-        OutputStreamWriter writer = new OutputStreamWriter(System.out);
-//        c.setResponseHandler(new BuffReaderMessageHandler(writer));
-        c.connect();
-
-        String user = "Den";
-        String resp = c.login(user);
-
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
-
-        Assert.assertEquals(c.getUserName(), user);
-
-        c.stop();
-
-        stopServer(s);
-    }
-
-    @Test
-    public void testDoubleLogin() throws Exception {
-        Server s = startServer();
-
-        Client c = new Client();
-        c.connect();
-
-        String[] users = new String [] {"Den", "Vasya"};
-
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
-        for (String user : users) {
-            c.login(user);
-        }
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
-
-        Assert.assertEquals(c.getUserName(), users[0]);
-
-        sleep();
-        c.stop();
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
-
-        stopServer(s);
-    }
-
-    private void sleep() {
+        Throwable t = null;
         try {
-            Thread.sleep(TIMEOUT);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+            c.connect("non-existing-host", PORT);
+        } catch (Throwable ex) {
+            t = ex;
         }
+        Assert.assertNotNull(t);
+        Assert.assertThat(t, CoreMatchers.instanceOf(UnresolvedAddressException.class));
+        Assert.assertFalse(c.isConnected());
+
+        c.connect(HOSTNAME, PORT);
+        c.stop();
     }
 
     @Test
-    public void testFewClientsLogin() throws Exception {
-        Server s = startServer();
-
-        int n = 3;
-        String baseName = "Den";
-        Client[] clients = new Client[n];
-
-
-        Assert.assertEquals(s.getSessionsCount(), 0);
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
-        for (int i = 0; i < clients.length; i++) {
-            clients[i] = new Client();
-            clients[i].connect();
-            clients[i].login(baseName + i);
-        }
-
-        Assert.assertEquals(s.getSessionsCount(), n);
-        Assert.assertEquals(s.getAuthorizedClientsCount(), n);
-
-        for (int i = 0; i < clients.length; i++) {
-            Assert.assertEquals(clients[i].getUserName(), baseName + i);
-            clients[i].stop();
-        }
-
-        stopServer(s);
-    }
-
-    @Test
-    public void testSameNameClientsLogin() throws Exception {
-        Server s = startServer();
-
+    public void testLogin() {
         Client c = new Client();
-        c.connect();
-
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 0);
+        c.connect(HOSTNAME, PORT);
         String user = "Den";
         c.login(user);
-
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
-
-        Client c2 = new Client();
-        c.login(user);
-
-        Assert.assertEquals(s.getAuthorizedClientsCount(), 1);
-
-        Assert.assertEquals(c.getUserName(), user);
-        Assert.assertNull(c2.getUserName());
-
+        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LOGIN)));
         c.stop();
-
-        stopServer(s);
     }
 
     @Test
-    public void testQuitCmd() throws Exception {
-        Server s = startServer();
-
+    public void testLogedIn() {
         Client c = new Client();
-        c.connect();
-        c.login("Den");
-        Assert.assertEquals(s.getSessionsCount(), 1);
-
-        c.quit();
-//
-        Assert.assertEquals(s.getSessionsCount(), 0);
-
-//        Assert.assertFalse(c.isConnected());
+        c.connect(HOSTNAME, PORT);
+        String user = "Den";
+        Assert.assertFalse(c.isLoggedIn());
+        c.login(user);
+        Assert.assertTrue(c.isLoggedIn());
         c.stop();
-        stopServer(s);
-
     }
 
-    /**
-     * иницилизирует новый сервер
-     * @return
-     */
-    private Server startServer() {
-       Server s = new Server();
-        s.start();
-        return s;
+
+
+    @Test
+    public void testQuit() throws Exception {
+        Client c = new Client();
+        c.connect(HOSTNAME, PORT);
+        Assert.assertTrue(c.isConnected());
+        c.quit();
+        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.QUIT)));
+        c.stop();
     }
 
-    private void stopServer(Server s) {
-        s.stop();
+    @Test
+    public void testGetUserName() {
+        Client c = new Client();
+        c.connect(HOSTNAME, PORT);
+        String user = "Den";
+        c.login(user);
+        Assert.assertEquals(c.getUserName(), user);
+        c.stop();
+    }
+
+    @Test
+    public void testFoo() throws Exception {
+        // TODO Remove!
+    }
+
+    @Test
+    public void testHelp() throws Exception {
+        Client c = new Client();
+        c.connect(HOSTNAME, PORT);
+        c.login("Den");
+        c.help();
+        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.HELP)));
+        c.stop();
+    }
+
+    @Test
+    public void testList() throws Exception {
+        Client c = new Client();
+        c.connect(HOSTNAME, PORT);
+        c.login("Den");
+        c.list();
+        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LIST)));
+        c.stop();
+    }
+
+    @Test
+    public void testSend() throws Exception {
+        Client c = new Client();
+        c.connect(HOSTNAME, PORT);
+        c.login("Den");
+        c.send("Hello");
+        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.SEND)));
+        c.stop();
     }
 }

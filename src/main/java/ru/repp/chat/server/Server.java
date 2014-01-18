@@ -1,81 +1,52 @@
 package ru.repp.chat.server;
 
-import org.apache.mina.core.service.IoAcceptor;
-import org.apache.mina.core.session.IdleStatus;
-import org.apache.mina.core.session.IoSession;
-import org.apache.mina.filter.codec.ProtocolCodecFilter;
-import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
-import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
-
 /**
- * Сервер чата
+ * Интерфейс взаимодействия с сервером
  *
- * @author @Drepp
- * @since 14.01.14
+ * @author den
+ * @since 1/18/14
  */
-public class Server {
-
-    private static final int defaultPort = 9123;
-    private int port;
-
-    private final static Logger LOG = LoggerFactory.getLogger((ServerApp.class));
-
-    IoAcceptor acceptor;
-
-    public Server() {
-        this(defaultPort);
-    }
-
-    public Server(int port) {
-        this.port = port;
-        acceptor = new NioSocketAcceptor();
-    }
-
-    public void start() {
-        try {
-            acceptor.getFilterChain().addLast( "codec", new ProtocolCodecFilter( new TextLineCodecFactory( Charset.forName("UTF-8"))));
-            acceptor.setHandler( new ServerHandler() );
-            acceptor.getSessionConfig().setReadBufferSize( 2048 );
-            acceptor.getSessionConfig().setIdleTime( IdleStatus.BOTH_IDLE, 10 );
-            acceptor.bind( new InetSocketAddress(port));
-            LOG.info("Server started");
-        } catch (IOException ex) {
-            LOG.error("Server startup failed", ex);
-        }
-    }
-
-    public void stop() {
-        acceptor.unbind();
-    }
+public interface Server {
 
     /**
-     * @return индикатор активности сервера
+     * старт сервера
      */
-    public boolean isServerActive() {
-        return acceptor.isActive();
-    }
+    void start();
 
     /**
-     * @return количество подключенных сессий
+     * остановка сервера
      */
-    public int getSessionsCount() {
-        return acceptor.getManagedSessionCount();
-    }
+    void stop();
 
     /**
-     * @return количество авторизованых клиентов
+     * @return индикатор активности севрера
      */
-    public int getAuthorizedClientsCount() {
-        int count = 0;
-        for (IoSession s :acceptor.getManagedSessions().values()) {
-            count += s.getAttribute("user") != null ? 1 : 0;
-        }
-        return count;
-    }
+    boolean isServerActive();
+
+    /**
+     * @return количество сессий
+     */
+    int getSessionsCount();
+
+    /**
+     * @return количество авторизованных клиентов
+     */
+    int getAuthorizedClientsCount();
+
+    /**
+     * задает менеджера сообщений
+     * @param manager
+     */
+    void setHistoryManager(HistoryManager manager);
+
+    /**
+     * @return менеджер истории
+     */
+    HistoryManager getHistoryManager();
+
+    /**
+     * Метод для ручного вещаения на всех клиентов
+     * @param msg сообщение
+     */
+//    void broadcast(String msg);
 }

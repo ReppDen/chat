@@ -1,17 +1,25 @@
 package ru.repp.chat.utils;
 
 /**
- * Здесь будет ваша реклама
+ * Утилиты чата
  *
  * @author den
  * @since 1/12/14
  */
 public class Utils {
     /**
-     * выводит сообщение в System.out
+     * шаблон клиентоской комманды
      */
-    @Deprecated
-    public static void echo(String msg) {
-        System.out.println(msg);
+    public static String getClinetCommandPattern(Command cmd) {
+        return "^\\" + cmd.toString() + "\\s\\w+$";
+    }
+
+    /**
+     * посылает указанную комманду клиенту
+     * @param cmd комманда
+     * @param arg аргумент
+     */
+    public static String makeCustomServerCmd(Command cmd, Response response, Object arg) {
+        return cmd.toString() + " " + response.toString() + " " + arg.toString();
     }
 }

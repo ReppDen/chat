@@ -17,15 +17,20 @@ public interface HistoryManager {
     public void add(String msg);
 
     /**
-     * Получить последние 100 сообщений
-     * @return 100 сообщений
+     * Получить последние N сообщений
+     * @return количество сообещний
      */
-    public List<String> getLast100();
+    public List<String> getLast(int n);
 
     /**
      * Очистить историю
      */
     public void clear();
+
+    /**
+     * @return количество сообщений
+     */
+    public int getCount();
 
 
 }

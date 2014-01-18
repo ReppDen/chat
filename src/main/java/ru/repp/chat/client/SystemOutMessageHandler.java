@@ -30,15 +30,11 @@ public class SystemOutMessageHandler implements ResponseHandler {
                 session.close(true);
                 break;
             }
-            case HELP: {
-                System.out.println("Nice try, LOL!");
+            case LIST: case HELP: {
+                System.out.println(value);
                 break;
             }
-            case LIST: {
-                break;
-            }
-            case SEND: default: {
-
+            default: {
                 break;
             }
         }

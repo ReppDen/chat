@@ -22,8 +22,6 @@ import java.util.concurrent.Executors;
  */
 public class Client {
 
-    private static final String HOSTNAME = "localhost";
-    private static final int PORT = 9123;
     private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
 
 
@@ -38,14 +36,6 @@ public class Client {
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.getFilterChain().addLast("executor", new ExecutorFilter(Executors.newSingleThreadExecutor()));
         connector.setHandler(new ClientHandler(responeHandler));
-    }
-
-    public void setResponseHandler(ResponseHandler h) {
-        responeHandler = h;
-
-    }
-    public void connect() {
-        connect(HOSTNAME, PORT);
     }
 
     public void connect(String host, int port) {
@@ -65,8 +55,10 @@ public class Client {
      * Останавливает клиента
      */
     public void stop() {
-        session.getConfig().setUseReadOperation(false);
-        session.close(true).awaitUninterruptibly();
+        if (session != null) {
+            session.getConfig().setUseReadOperation(false);
+            session.close(false).awaitUninterruptibly();
+        }
     }
 
     /**
@@ -74,17 +66,17 @@ public class Client {
      * @param cmd комманда
      * @param arg аргумент
      */
-    public String sendCustomCmd(Command cmd, Object arg) {
+    private void sendCustomCmd(Command cmd, Object arg) {
         session.write(cmd.toString() + " " + arg).awaitUninterruptibly();
-        return (String)session.read().awaitUninterruptibly().getMessage();
+        session.read().awaitUninterruptibly();
     }
 
     /**
      * отправка комманды авторизации
      * @param name имя пользователя
      */
-    public String login(String name) {
-        return sendCustomCmd(Command.LOGIN, name);
+    public void login(String name) {
+        sendCustomCmd(Command.LOGIN, name);
     }
 
     /**
@@ -99,5 +91,24 @@ public class Client {
      */
     public void quit() {
         sendCustomCmd(Command.QUIT, null);
+    }
+
+    public IoSession getSession() {
+        return session;
+    }
+    public boolean isLoggedIn() {
+        return session != null && session.getAttribute("user") != null;
+    }
+
+    public void help() {
+        sendCustomCmd(Command.HELP, null);
+    }
+
+    public void list() {
+        sendCustomCmd(Command.LIST, null);
+    }
+
+    public void send(String msg) {
+        sendCustomCmd(Command.SEND, msg);
     }
 }

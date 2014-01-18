@@ -1,5 +1,6 @@
 package ru.repp.chat.server;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -9,17 +10,31 @@ import java.util.List;
  */
 public class MemoryHistoryManager implements HistoryManager{
 
-    public void add(String msg) {
-        //TODO
+    List<String> store;
+
+    public MemoryHistoryManager() {
+        store = new LinkedList<String>();
     }
 
-    public List<String> getLast100() {
-        // TODO
-        return null;
+    public void add(String msg) {
+        store.add(msg);
+    }
+
+    public List<String> getLast(int n) {
+        if (n <= 0) {
+            throw  new IllegalArgumentException("Count must be bigger than zero");
+        }
+        int len = store.size();
+        return store.subList(len-n,len);
     }
 
     public void clear() {
-        // TODO
+        store.clear();
 
+    }
+
+    @Override
+    public int getCount() {
+        return store.size();
     }
 }
