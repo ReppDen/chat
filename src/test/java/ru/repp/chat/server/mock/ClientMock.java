@@ -8,6 +8,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import ru.repp.chat.client.Client;
+import ru.repp.chat.utils.Constants;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
@@ -21,14 +22,14 @@ import java.util.concurrent.Executors;
  */
 public class ClientMock implements Client {
 
-    private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
+
 
     private NioSocketConnector connector;
     private IoSession session;
 
     public ClientMock() {
         connector = new NioSocketConnector();
-        connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
+        connector.setConnectTimeoutMillis(Constants.CONNECT_TIMEOUT);
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.getFilterChain().addLast("executor", new ExecutorFilter(Executors.newSingleThreadExecutor()));
         connector.setHandler(new IoHandlerAdapter());

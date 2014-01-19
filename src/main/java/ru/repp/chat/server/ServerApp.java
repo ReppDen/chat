@@ -1,5 +1,7 @@
 package ru.repp.chat.server;
 
+import ru.repp.chat.utils.Constants;
+
 import java.io.IOException;
 
 /**
@@ -10,9 +12,8 @@ import java.io.IOException;
  */
 public class ServerApp {
 
-    private static final int PORT = 9123;
 
     public static void main(String[] args) throws IOException {
-        new BaseServer(PORT).start();
+        new BaseServer(Constants.PORT).start();
     }
 }

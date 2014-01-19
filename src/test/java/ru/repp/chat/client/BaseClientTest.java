@@ -8,10 +8,15 @@ import org.junit.Test;
 import ru.repp.chat.client.mock.ServerMock;
 import ru.repp.chat.server.Server;
 import ru.repp.chat.utils.Command;
+import ru.repp.chat.utils.Constants;
 import ru.repp.chat.utils.Utils;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.nio.channels.UnresolvedAddressException;
+
 
 /**
  * Тесты для клиента
@@ -22,14 +27,12 @@ import java.nio.channels.UnresolvedAddressException;
  */
 public class BaseClientTest {
 
-    private static final String HOSTNAME = "localhost";
-    private static final int PORT = 9123;
 
     Server server;
 
     @Before
     public void startServer() {
-        server = new ServerMock(PORT);
+        server = new ServerMock(Constants.PORT);
         server.start();
     }
 
@@ -42,7 +45,7 @@ public class BaseClientTest {
     public void testConnect() throws Exception {
         Client c = new BaseClient();
         Assert.assertFalse(c.isConnected());
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         Assert.assertTrue(c.isConnected());
         // cообщений не отправляллось
         Assert.assertEquals(server.getHistoryManager().getCount(), 0);
@@ -56,7 +59,7 @@ public class BaseClientTest {
         Assert.assertFalse(c.isConnected());
         c.stop();
         Assert.assertFalse(c.isConnected());
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         Assert.assertTrue(c.isConnected());
         c.stop();
         Assert.assertFalse(c.isConnected());
@@ -65,7 +68,7 @@ public class BaseClientTest {
     @Test
     public void testLogin() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         String user = "Den";
         c.login(user);
         Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LOGIN)));
@@ -76,7 +79,7 @@ public class BaseClientTest {
     public void testConstructor() throws Exception {
         String fileName = "file.txt";
         Client c = new BaseClient(new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName))));
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         c.login("Den");
         c.stop();
         File file = new File(fileName);
@@ -92,7 +95,7 @@ public class BaseClientTest {
 
         Throwable t = null;
         try {
-            c.connect("non-existing-host", PORT);
+            c.connect("non-existing-host", Constants.PORT);
         } catch (Throwable ex) {
             t = ex;
         }
@@ -100,7 +103,7 @@ public class BaseClientTest {
         Assert.assertThat(t, CoreMatchers.instanceOf(UnresolvedAddressException.class));
         Assert.assertFalse(c.isConnected());
 
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         c.stop();
     }
 
@@ -108,7 +111,7 @@ public class BaseClientTest {
     @Test
     public void testLogedIn() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         String user = "Den";
         Assert.assertFalse(c.isLoggedIn());
         c.login(user);
@@ -121,7 +124,7 @@ public class BaseClientTest {
     @Test
     public void testQuit() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         Assert.assertTrue(c.isConnected());
         c.quit();
         Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.QUIT)));
@@ -131,7 +134,7 @@ public class BaseClientTest {
     @Test
     public void testGetUserName() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         String user = "Den";
         c.login(user);
         Assert.assertEquals(c.getUserName(), user);
@@ -141,7 +144,7 @@ public class BaseClientTest {
     @Test
     public void testHelp() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         c.login("Den");
         c.help();
         Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.HELP)));
@@ -151,7 +154,7 @@ public class BaseClientTest {
     @Test
     public void testList() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         c.login("Den");
         c.list();
         Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LIST)));
@@ -161,7 +164,7 @@ public class BaseClientTest {
     @Test
     public void testSend() throws Exception {
         Client c = new BaseClient();
-        c.connect(HOSTNAME, PORT);
+        c.connect(Constants.HOSTNAME, Constants.PORT);
         c.login("Den");
         c.send("Hello");
         Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.SEND)));

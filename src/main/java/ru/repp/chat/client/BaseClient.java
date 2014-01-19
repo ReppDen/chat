@@ -7,6 +7,7 @@ import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import ru.repp.chat.utils.Command;
+import ru.repp.chat.utils.Constants;
 
 import java.io.PrintStream;
 import java.net.InetSocketAddress;
@@ -20,8 +21,6 @@ import java.util.concurrent.Executors;
  * @since 1/16/14
  */
 public class BaseClient implements Client {
-
-    private static final long CONNECT_TIMEOUT = 30*1000L; // 30 seconds
 
 
     private NioSocketConnector connector;
@@ -42,7 +41,7 @@ public class BaseClient implements Client {
     public BaseClient(PrintStream printStream) {
         this.printStream = printStream;
         connector = new NioSocketConnector();
-        connector.setConnectTimeoutMillis(CONNECT_TIMEOUT);
+        connector.setConnectTimeoutMillis(Constants.CONNECT_TIMEOUT);
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.getFilterChain().addLast("executor", new ExecutorFilter(Executors.newSingleThreadExecutor()));
         connector.setHandler(new ClientMessageHandler(new PrintStreamResponseHandler(printStream)));

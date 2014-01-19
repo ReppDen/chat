@@ -74,8 +74,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
                 session.setAttribute("user", user);
 
                 users.add(user);
-                WriteFuture future = session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user)).awaitUninterruptibly();
-                future.isDone();
+                WriteFuture future = session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user));
                 broadcast("User " + user + " has joined the chat.");
                 break;
             }
