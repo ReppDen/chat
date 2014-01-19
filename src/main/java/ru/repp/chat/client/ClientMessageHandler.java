@@ -43,7 +43,7 @@ public class ClientMessageHandler extends IoHandlerAdapter {
             // комманда успешно обработана
             responseHandler.messageReceived(session, cmd, value);
         } else {
-            responseHandler.error(value);
+            responseHandler.error(cmd, value);
         }
 
     }

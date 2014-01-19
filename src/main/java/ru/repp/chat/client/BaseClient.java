@@ -9,7 +9,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Constants;
 
-import java.io.PrintStream;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
@@ -23,6 +23,7 @@ import java.util.concurrent.Executors;
 public class BaseClient implements Client {
 
 
+    private BufferedReader inReader;
     private NioSocketConnector connector;
     private IoSession session;
     private PrintStream printStream;
@@ -31,20 +32,23 @@ public class BaseClient implements Client {
      * по умолчанию выводит все сообщения в System.out
      */
     public BaseClient() {
-        this(System.out);
+        this(System.out,  new BufferedReader(new InputStreamReader(System.in)));
     }
 
     /**
      * Создает клиента чата
      * @param printStream поток, в который будут записываться сообщения клиента
+     * @param inReader поток, откуда считываются водные данные
      */
-    public BaseClient(PrintStream printStream) {
+    public BaseClient(PrintStream printStream, BufferedReader inReader) {
         this.printStream = printStream;
+        this.inReader = inReader;
         connector = new NioSocketConnector();
         connector.setConnectTimeoutMillis(Constants.CONNECT_TIMEOUT);
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.getFilterChain().addLast("executor", new ExecutorFilter(Executors.newSingleThreadExecutor()));
-        connector.setHandler(new ClientMessageHandler(new PrintStreamResponseHandler(printStream)));
+        connector.setHandler(new ClientMessageHandler(new PrintStreamResponseHandler(printStream, this)));
+        printStream.println("Welcome co ChatApp! You need to log in for continue.");
     }
 
     @Override
@@ -65,7 +69,7 @@ public class BaseClient implements Client {
     @Override
     public void stop() {
         if (session != null) {
-            session.getConfig().setUseReadOperation(false);
+//            session.getConfig().setUseReadOperation(false);
             session.close(false).awaitUninterruptibly();
         }
         if (printStream != null && printStream != System.out) {
@@ -121,5 +125,15 @@ public class BaseClient implements Client {
     @Override
     public void send(String msg) {
         sendCustomCmd(Command.SEND, msg);
+    }
+
+    @Override
+    public void doLogin() throws IOException {
+        String msg;
+        do {
+            printStream.println("Please your nickname (one word, english characters, numbers and \"_\" allowed)");
+            msg = inReader.readLine();
+        } while (!msg.matches("[A-Za-z0-9_]+"));
+        this.login(msg);
     }
 }

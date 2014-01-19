@@ -1,6 +1,5 @@
 package ru.repp.chat.server;
 
-import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -74,7 +73,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
                 session.setAttribute("user", user);
 
                 users.add(user);
-                WriteFuture future = session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user));
+                session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user));
                 broadcast("User " + user + " has joined the chat.");
                 break;
             }
@@ -117,7 +116,9 @@ public class ServerMessageHandler extends IoHandlerAdapter {
         String user = (String) session.getAttribute("user");
         users.remove(user);
         sessions.remove(session);
-        broadcast("User " + user + " has left the chat");
+        if (user != null) {
+            broadcast("User " + user + " has left the chat");
+        }
     }
 
 

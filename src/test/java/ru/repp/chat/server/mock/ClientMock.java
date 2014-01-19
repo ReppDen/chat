@@ -10,6 +10,7 @@ import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import ru.repp.chat.client.Client;
 import ru.repp.chat.utils.Constants;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
@@ -94,6 +95,11 @@ public class ClientMock implements Client {
 
     @Override
     public void send(String msg) {
+
+    }
+
+    @Override
+    public void doLogin() throws IOException {
 
     }
 

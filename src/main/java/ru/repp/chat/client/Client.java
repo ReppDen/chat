@@ -2,6 +2,8 @@ package ru.repp.chat.client;
 
 import org.apache.mina.core.session.IoSession;
 
+import java.io.IOException;
+
 /**
  * Здесь будет ваша реклама
  *
@@ -43,4 +45,10 @@ public interface Client {
     void list() throws Exception;
 
     void send(String msg) throws Exception;
+
+    /**
+     * запустить интерактивную процедуру логина
+     * @throws IOException
+     */
+    void doLogin() throws IOException;
 }

@@ -78,7 +78,7 @@ public class BaseClientTest {
     @Test
     public void testConstructor() throws Exception {
         String fileName = "file.txt";
-        Client c = new BaseClient(new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName))));
+        Client c = new BaseClient(new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName))), null); // TODO дописать тест
         c.connect(Constants.HOSTNAME, Constants.PORT);
         c.login("Den");
         c.stop();
@@ -169,5 +169,11 @@ public class BaseClientTest {
         c.send("Hello");
         Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.SEND)));
         c.stop();
+    }
+
+    @Test
+    public void testName() throws Exception {
+
+
     }
 }

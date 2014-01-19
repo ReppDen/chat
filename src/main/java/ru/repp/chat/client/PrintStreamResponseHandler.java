@@ -16,13 +16,23 @@ public  class PrintStreamResponseHandler implements ResponseHandler {
 
 
     private final PrintStream printStream;
+    private final Client client;
 
-    public PrintStreamResponseHandler(PrintStream printStream) {
+    public PrintStreamResponseHandler(PrintStream printStream, Client client) {
         this.printStream = printStream;
+        this.client = client;
     }
 
-    public void error(String msg) throws IOException {
+    public void error(Command cmd, String msg) throws IOException {
         printStream.println("Server send an error! " + msg);
+        switch (cmd) {
+            case LOGIN: {
+                // логин не удался, повторяем
+                // FIXME эта хуйня не работает!
+                client.doLogin();
+                break;
+            }
+        }
 
     }
 
@@ -44,6 +54,7 @@ public  class PrintStreamResponseHandler implements ResponseHandler {
                 break;
             }
             default: {
+                printStream.println(value);
                 break;
             }
         }
