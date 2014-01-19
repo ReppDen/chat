@@ -1,4 +1,4 @@
-package ru.repp.chat.server;
+package ru.repp.chat.server.history;
 
 import java.util.List;
 

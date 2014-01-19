@@ -4,7 +4,8 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Response;
-import ru.repp.chat.utils.ResponseHandler;
+
+import java.io.IOException;
 
 /**
 * обработчик сетевого взаимодействия клиента
@@ -12,11 +13,11 @@ import ru.repp.chat.utils.ResponseHandler;
 * @author den
 * @since 1/12/14
 */
-public class ClientHandler extends IoHandlerAdapter {
+public class ClientMessageHandler extends IoHandlerAdapter {
 
 
     ResponseHandler responseHandler;
-    public ClientHandler(ResponseHandler responseHandler) {
+    public ClientMessageHandler(ResponseHandler responseHandler) {
         this.responseHandler = responseHandler;
     }
     @Override
@@ -29,7 +30,7 @@ public class ClientHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void messageReceived(IoSession session, Object message) {
+    public void messageReceived(IoSession session, Object message) throws IOException {
         String completeMsg = (String) message;
         String[] parts = completeMsg.split(" ", 3);
         String command = parts[0];

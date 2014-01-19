@@ -5,20 +5,22 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import ru.repp.chat.client.mock.ServerMock;
 import ru.repp.chat.server.Server;
-import ru.repp.chat.server.ServerMock;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Utils;
 
+import java.io.*;
 import java.nio.channels.UnresolvedAddressException;
 
 /**
  * Тесты для клиента
+ * Проверяется корректность клиентских комманд, соединение с сервером
  *
  * @author @Drepp
  * @since 14.01.14
  */
-public class ClientTest {
+public class BaseClientTest {
 
     private static final String HOSTNAME = "localhost";
     private static final int PORT = 9123;
@@ -37,8 +39,8 @@ public class ClientTest {
     }
 
     @Test
-    public void testConnect() {
-        Client c = new Client();
+    public void testConnect() throws Exception {
+        Client c = new BaseClient();
         Assert.assertFalse(c.isConnected());
         c.connect(HOSTNAME, PORT);
         Assert.assertTrue(c.isConnected());
@@ -49,8 +51,8 @@ public class ClientTest {
     }
 
     @Test
-    public void testStop() {
-        Client c = new Client();
+    public void testStop()  throws Exception {
+        Client c = new BaseClient();
         Assert.assertFalse(c.isConnected());
         c.stop();
         Assert.assertFalse(c.isConnected());
@@ -61,8 +63,31 @@ public class ClientTest {
     }
 
     @Test
-    public void testConnectFail() {
-        Client c = new Client();
+    public void testLogin() throws Exception {
+        Client c = new BaseClient();
+        c.connect(HOSTNAME, PORT);
+        String user = "Den";
+        c.login(user);
+        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LOGIN)));
+        c.stop();
+    }
+
+    @Test
+    public void testConstructor() throws Exception {
+        String fileName = "file.txt";
+        Client c = new BaseClient(new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName))));
+        c.connect(HOSTNAME, PORT);
+        c.login("Den");
+        c.stop();
+        File file = new File(fileName);
+        Assert.assertNotEquals(file.length(), 0);
+        Assert.assertTrue(file.delete());
+
+    }
+
+    @Test
+    public void testConnectFail() throws Exception {
+        Client c = new BaseClient();
         Assert.assertFalse(c.isConnected());
 
         Throwable t = null;
@@ -79,19 +104,10 @@ public class ClientTest {
         c.stop();
     }
 
-    @Test
-    public void testLogin() {
-        Client c = new Client();
-        c.connect(HOSTNAME, PORT);
-        String user = "Den";
-        c.login(user);
-        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LOGIN)));
-        c.stop();
-    }
 
     @Test
-    public void testLogedIn() {
-        Client c = new Client();
+    public void testLogedIn() throws Exception {
+        Client c = new BaseClient();
         c.connect(HOSTNAME, PORT);
         String user = "Den";
         Assert.assertFalse(c.isLoggedIn());
@@ -104,7 +120,7 @@ public class ClientTest {
 
     @Test
     public void testQuit() throws Exception {
-        Client c = new Client();
+        Client c = new BaseClient();
         c.connect(HOSTNAME, PORT);
         Assert.assertTrue(c.isConnected());
         c.quit();
@@ -113,8 +129,8 @@ public class ClientTest {
     }
 
     @Test
-    public void testGetUserName() {
-        Client c = new Client();
+    public void testGetUserName() throws Exception {
+        Client c = new BaseClient();
         c.connect(HOSTNAME, PORT);
         String user = "Den";
         c.login(user);
@@ -123,13 +139,8 @@ public class ClientTest {
     }
 
     @Test
-    public void testFoo() throws Exception {
-        // TODO Remove!
-    }
-
-    @Test
     public void testHelp() throws Exception {
-        Client c = new Client();
+        Client c = new BaseClient();
         c.connect(HOSTNAME, PORT);
         c.login("Den");
         c.help();
@@ -139,7 +150,7 @@ public class ClientTest {
 
     @Test
     public void testList() throws Exception {
-        Client c = new Client();
+        Client c = new BaseClient();
         c.connect(HOSTNAME, PORT);
         c.login("Den");
         c.list();
@@ -149,7 +160,7 @@ public class ClientTest {
 
     @Test
     public void testSend() throws Exception {
-        Client c = new Client();
+        Client c = new BaseClient();
         c.connect(HOSTNAME, PORT);
         c.login("Den");
         c.send("Hello");

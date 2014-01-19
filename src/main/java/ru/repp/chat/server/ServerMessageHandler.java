@@ -1,5 +1,6 @@
 package ru.repp.chat.server;
 
+import org.apache.mina.core.future.WriteFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -18,7 +19,7 @@ import java.util.Set;
  * @author den
  * @since 1/12/14
  */
-public class ServerHandler extends IoHandlerAdapter {
+public class ServerMessageHandler extends IoHandlerAdapter {
 
     private final Set<IoSession> sessions = Collections
             .synchronizedSet(new HashSet<IoSession>());
@@ -73,7 +74,8 @@ public class ServerHandler extends IoHandlerAdapter {
                 session.setAttribute("user", user);
 
                 users.add(user);
-                session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user));
+                WriteFuture future = session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user)).awaitUninterruptibly();
+                future.isDone();
                 broadcast("User " + user + " has joined the chat.");
                 break;
             }

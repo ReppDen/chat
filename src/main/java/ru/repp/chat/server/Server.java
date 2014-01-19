@@ -1,5 +1,11 @@
 package ru.repp.chat.server;
 
+import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IoSession;
+import ru.repp.chat.server.history.HistoryManager;
+
+import java.util.Map;
+
 /**
  * Интерфейс взаимодействия с сервером
  *
@@ -12,6 +18,10 @@ public interface Server {
      * старт сервера
      */
     void start();
+
+    IoHandlerAdapter getMessageHandler();
+
+    void setMessageHandler(IoHandlerAdapter messageHandler);
 
     /**
      * остановка сервера
@@ -33,10 +43,6 @@ public interface Server {
      */
     int getAuthorizedClientsCount();
 
-    /**
-     * задает менеджера сообщений
-     * @param manager
-     */
     void setHistoryManager(HistoryManager manager);
 
     /**
@@ -44,9 +50,6 @@ public interface Server {
      */
     HistoryManager getHistoryManager();
 
-    /**
-     * Метод для ручного вещаения на всех клиентов
-     * @param msg сообщение
-     */
-//    void broadcast(String msg);
+
+    Map<Long, IoSession> getSessions();
 }

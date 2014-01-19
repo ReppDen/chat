@@ -15,11 +15,21 @@ public class Utils {
     }
 
     /**
-     * посылает указанную комманду клиенту
+     * формирует ответ сервера
      * @param cmd комманда
+     * @param response ответа
      * @param arg аргумент
      */
     public static String makeCustomServerCmd(Command cmd, Response response, Object arg) {
         return cmd.toString() + " " + response.toString() + " " + arg.toString();
+    }
+
+    /**
+     * формирует клиентскую комманду
+     * @param cmd комманда
+     * @param arg аргумент
+     */
+    public static String makeCustomClientCmd(Command cmd, Object arg) {
+        return cmd.toString() + " " + arg.toString();
     }
 }

@@ -1,8 +1,5 @@
 package ru.repp.chat.client;
 
-import java.io.FileReader;
-import java.io.IOException;
-
 /**
  * Клиентское приложение
  *
@@ -11,7 +8,13 @@ import java.io.IOException;
  */
 public class ClientApp {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    private static final String HOSTNAME = "localhost";
+    private static final int PORT = 9123;
+
+    public static void main(String[] args) throws Exception {
+        Client c = new BaseClient();
+        c.connect(HOSTNAME, PORT);
+        c.login("Den");
     }
 
 

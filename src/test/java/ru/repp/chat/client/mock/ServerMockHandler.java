@@ -1,7 +1,8 @@
-package ru.repp.chat.server;
+package ru.repp.chat.client.mock;
 
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import ru.repp.chat.server.Server;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Response;
 import ru.repp.chat.utils.Utils;
