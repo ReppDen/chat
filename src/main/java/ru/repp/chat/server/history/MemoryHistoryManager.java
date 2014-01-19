@@ -17,6 +17,7 @@ public class MemoryHistoryManager implements HistoryManager{
     }
 
     public void add(String msg) {
+        System.out.println("history " + msg);
         store.add(msg);
     }
 

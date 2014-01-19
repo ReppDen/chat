@@ -23,4 +23,5 @@ public class Constants {
      */
     public static final int PORT = 9123;
 
+    public static final int HISTORY_LIMIT = 3;
 }

@@ -34,7 +34,7 @@ public class BaseServer implements Server{
     public BaseServer(int port) {
         this.port = port;
         acceptor = new NioSocketAcceptor();
-        messageHandler = new ServerMessageHandler();
+        messageHandler = new ServerMessageHandler(new MemoryHistoryManager());
     }
 
     public void start() {

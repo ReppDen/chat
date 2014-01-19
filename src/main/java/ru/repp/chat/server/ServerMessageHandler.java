@@ -4,7 +4,9 @@ import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ru.repp.chat.server.history.HistoryManager;
 import ru.repp.chat.utils.Command;
+import ru.repp.chat.utils.Constants;
 import ru.repp.chat.utils.Response;
 import ru.repp.chat.utils.Utils;
 
@@ -28,6 +30,11 @@ public class ServerMessageHandler extends IoHandlerAdapter {
 
 
     private final static Logger LOG = LoggerFactory.getLogger((ServerApp.class));
+    private final HistoryManager historyManager;
+
+    public ServerMessageHandler(HistoryManager historyManager) {
+        this.historyManager = historyManager;
+    }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
@@ -74,6 +81,11 @@ public class ServerMessageHandler extends IoHandlerAdapter {
 
                 users.add(user);
                 session.write(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, user));
+                synchronized (historyManager) {
+                    for (String m : historyManager.getLast(Constants.HISTORY_LIMIT)) {
+                        session.write(Utils.makeCustomServerCmd(Command.SEND, Response.OK, m));
+                    }
+                }
                 broadcast("User " + user + " has joined the chat.");
                 break;
             }
@@ -90,7 +102,11 @@ public class ServerMessageHandler extends IoHandlerAdapter {
                 break;
             }
             case SEND: default: {
-                broadcast(user + ": " + value);
+                String chatMessage = user + ": " + value;
+                synchronized (historyManager) {
+                    historyManager.add(chatMessage);
+                }
+                broadcast(chatMessage);
                 break;
             }
         }
