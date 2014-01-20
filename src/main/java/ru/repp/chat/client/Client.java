@@ -1,5 +1,6 @@
 package ru.repp.chat.client;
 
+import org.apache.mina.core.service.IoHandler;
 import org.apache.mina.core.session.IoSession;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.io.IOException;
  * @author den
  * @since 1/19/14
  */
-public interface Client {
+public interface Client extends IoHandler {
     void connect(String host, int port) throws Exception;
 
     boolean isConnected() throws Exception;
@@ -24,7 +25,7 @@ public interface Client {
      * отправка комманды авторизации
      * @param name имя пользователя
      */
-    void login(String name) throws Exception;
+    String login(String name) throws Exception;
 
     /**
      * @return Возворащает имя авторизованног опользователя, null если не авторизован
@@ -46,9 +47,11 @@ public interface Client {
 
     void send(String msg) throws Exception;
 
+    String sendRawText(String msg) throws Exception;
+
     /**
      * запустить интерактивную процедуру логина
      * @throws IOException
      */
-    void doLogin() throws IOException;
+    void doLogin() throws Exception;
 }

@@ -5,14 +5,13 @@ import org.apache.mina.core.session.IoSession;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Response;
 
-import java.io.IOException;
-
 /**
 * обработчик сетевого взаимодействия клиента
 *
 * @author den
 * @since 1/12/14
 */
+@Deprecated
 public class ClientMessageHandler extends IoHandlerAdapter {
 
 
@@ -30,7 +29,7 @@ public class ClientMessageHandler extends IoHandlerAdapter {
     }
 
     @Override
-    public void messageReceived(IoSession session, Object message) throws IOException {
+    public void messageReceived(IoSession session, Object message) throws Exception {
         String completeMsg = (String) message;
         String[] parts = completeMsg.split(" ", 3);
         String command = parts[0];

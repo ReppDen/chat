@@ -24,7 +24,6 @@ public class ServerMockHandler extends IoHandlerAdapter {
     @Override
     public void messageReceived(IoSession session, Object message) throws Exception {
         String completeMsg = (String) message;
-        s.getHistoryManager().add(completeMsg);
         String[] parts = completeMsg.split(" ", 2);
         String command = parts[0];
         String value = parts[1];

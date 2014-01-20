@@ -11,7 +11,7 @@ import java.io.IOException;
  */
 public interface ResponseHandler {
 
-    public void error(Command cmd, String msg) throws IOException;
+    public void error(Command cmd, String msg) throws Exception;
 
     public void messageReceived(IoSession session, Command cmd, String value) throws IOException;
 }

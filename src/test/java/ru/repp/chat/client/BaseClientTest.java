@@ -9,6 +9,7 @@ import ru.repp.chat.client.mock.ServerMock;
 import ru.repp.chat.server.Server;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Constants;
+import ru.repp.chat.utils.Response;
 import ru.repp.chat.utils.Utils;
 
 import java.io.BufferedOutputStream;
@@ -172,8 +173,18 @@ public class BaseClientTest {
     }
 
     @Test
-    public void testName() throws Exception {
+    public void testLogin2() throws Exception {
+        Client c = new BaseClient();
 
+        c.connect(Constants.HOSTNAME, Constants.PORT);
+
+        String name = "Den";
+        String res = c.login(name);
+
+        Assert.assertEquals(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, name),res);
+
+        c.stop();
 
     }
+
 }

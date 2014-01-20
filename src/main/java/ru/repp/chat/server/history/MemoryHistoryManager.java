@@ -17,7 +17,6 @@ public class MemoryHistoryManager implements HistoryManager{
     }
 
     public void add(String msg) {
-        System.out.println("history " + msg);
         store.add(msg);
     }
 
@@ -25,8 +24,8 @@ public class MemoryHistoryManager implements HistoryManager{
         if (n <= 0) {
             throw  new IllegalArgumentException("Count must be bigger than zero");
         }
-        int len = store.size();
-        return store.subList(len-n,len);
+        int start = store.size() - n >= 0 ? store.size() - n : 0;
+        return store.subList(start,store.size());
     }
 
     public void clear() {
@@ -34,7 +33,6 @@ public class MemoryHistoryManager implements HistoryManager{
 
     }
 
-    @Override
     public int getCount() {
         return store.size();
     }

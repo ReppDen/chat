@@ -32,4 +32,8 @@ public class Utils {
     public static String makeCustomClientCmd(Command cmd, Object arg) {
         return cmd.toString() + " " + arg.toString();
     }
+
+    public static boolean matcheslinetCommonCommandPattern(String msg) {
+        return msg.matches("^/\\w+(\\s\\w+)*$");
+    }
 }

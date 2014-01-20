@@ -2,6 +2,7 @@ package ru.repp.chat.server.mock;
 
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
+import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -22,8 +23,6 @@ import java.util.concurrent.Executors;
  * @since 1/19/14
  */
 public class ClientMock implements Client {
-
-
 
     private NioSocketConnector connector;
     private IoSession session;
@@ -59,8 +58,8 @@ public class ClientMock implements Client {
     }
 
     @Override
-    public void login(String name) throws Exception {
-
+    public String login(String name) throws Exception {
+        return null;
     }
 
     @Override
@@ -98,9 +97,40 @@ public class ClientMock implements Client {
 
     }
 
+    public String sendRawText(String msg) throws Exception {
+        return null;
+    }
+
     @Override
     public void doLogin() throws IOException {
 
     }
 
+    public void sessionCreated(IoSession session) throws Exception {
+
+    }
+
+    public void sessionOpened(IoSession session) throws Exception {
+
+    }
+
+    public void sessionClosed(IoSession session) throws Exception {
+
+    }
+
+    public void sessionIdle(IoSession session, IdleStatus status) throws Exception {
+
+    }
+
+    public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
+
+    }
+
+    public void messageReceived(IoSession session, Object message) throws Exception {
+
+    }
+
+    public void messageSent(IoSession session, Object message) throws Exception {
+
+    }
 }

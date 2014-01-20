@@ -56,12 +56,12 @@ public class BaseServer implements Server{
         return LOG;
     }
 
-    @Override
+    
     public IoHandlerAdapter getMessageHandler() {
         return messageHandler;
     }
 
-    @Override
+    
     public void setMessageHandler(IoHandlerAdapter messageHandler) {
         this.messageHandler = messageHandler;
     }
@@ -99,17 +99,17 @@ public class BaseServer implements Server{
     }
 
 
-    @Override
+    
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
 
-    @Override
+    
     public void setHistoryManager(HistoryManager manager) {
         historyManager = manager;
     }
 
-    @Override
+    
     public Map<Long, IoSession> getSessions() {
         return acceptor.getManagedSessions();
     }

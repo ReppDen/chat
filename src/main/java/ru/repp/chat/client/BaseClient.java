@@ -1,6 +1,7 @@
 package ru.repp.chat.client;
 
 import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
@@ -8,6 +9,8 @@ import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
 import ru.repp.chat.utils.Command;
 import ru.repp.chat.utils.Constants;
+import ru.repp.chat.utils.Response;
+import ru.repp.chat.utils.Utils;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -20,7 +23,7 @@ import java.util.concurrent.Executors;
  * @author den
  * @since 1/16/14
  */
-public class BaseClient implements Client {
+public class BaseClient extends IoHandlerAdapter implements Client {
 
 
     private BufferedReader inReader;
@@ -47,11 +50,11 @@ public class BaseClient implements Client {
         connector.setConnectTimeoutMillis(Constants.CONNECT_TIMEOUT);
         connector.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         connector.getFilterChain().addLast("executor", new ExecutorFilter(Executors.newSingleThreadExecutor()));
-        connector.setHandler(new ClientMessageHandler(new PrintStreamResponseHandler(printStream, this)));
+        connector.setHandler(this);
         printStream.println("Welcome co ChatApp! You need to log in for continue.");
     }
 
-    @Override
+    
     public void connect(String host, int port) {
 
         // создаем сессию
@@ -61,12 +64,12 @@ public class BaseClient implements Client {
         session.getConfig().setUseReadOperation(true);
     }
 
-    @Override
+    
     public boolean isConnected() {
         return session != null && session.isConnected();
     }
 
-    @Override
+    
     public void stop() {
         if (session != null) {
 //            session.getConfig().setUseReadOperation(false);
@@ -83,57 +86,113 @@ public class BaseClient implements Client {
      * @param cmd комманда
      * @param arg аргумент
      */
-    private void sendCustomCmd(Command cmd, Object arg) {
-        session.write(cmd.toString() + " " + arg).awaitUninterruptibly();
-        session.read().awaitUninterruptibly();
+    private String sendCustomCmd(Command cmd, Object arg) throws Exception {
+        return sendRawText(Utils.makeCustomClientCmd(cmd,arg));
     }
 
-    @Override
-    public void login(String name) {
-        sendCustomCmd(Command.LOGIN, name);
+    
+    public String login(String name) throws Exception {
+        return sendCustomCmd(Command.LOGIN, name);
     }
 
-    @Override
+    
     public String getUserName() {
         return session != null ? (String) session.getAttribute("user") : null;
     }
 
-    @Override
-    public void quit() {
+    
+    public void quit() throws Exception {
         sendCustomCmd(Command.QUIT, null);
     }
 
-    @Override
+    
     public IoSession getSession() {
         return session;
     }
-    @Override
+    
     public boolean isLoggedIn() {
         return session != null && session.getAttribute("user") != null;
     }
 
-    @Override
-    public void help() {
+    
+    public void help() throws Exception {
         sendCustomCmd(Command.HELP, null);
     }
 
-    @Override
-    public void list() {
+    
+    public void list() throws Exception {
         sendCustomCmd(Command.LIST, null);
     }
 
-    @Override
-    public void send(String msg) {
+    
+    public void send(String msg) throws Exception {
         sendCustomCmd(Command.SEND, msg);
     }
 
-    @Override
-    public void doLogin() throws IOException {
+    public String sendRawText(String msg) throws Exception {
+        session.write(msg).awaitUninterruptibly();
+        return (String) session.read().awaitUninterruptibly().getMessage();
+    }
+
+    public void doLogin() throws Exception {
         String msg;
         do {
             printStream.println("Please your nickname (one word, english characters, numbers and \"_\" allowed)");
             msg = inReader.readLine();
         } while (!msg.matches("[A-Za-z0-9_]+"));
         this.login(msg);
+    }
+
+    @Override
+    public void messageReceived(IoSession session, Object message) throws Exception {
+        String completeMsg = (String) message;
+        String[] parts = completeMsg.split(" ", 3);
+        String command = parts[0];
+        String status = parts[1];
+        String value = parts.length > 2 ? parts[2] : "";
+
+        Command cmd = Command.formString(command);
+
+        if (Response.OK.toString().equals(status)) {
+            // комманда успешно обработана
+            switch (cmd) {
+                case LOGIN: {
+                    printStream.println("Login successfull!");
+                    printStream.println("[Hint] Type /help to get command list");
+                    session.setAttribute("user", value);
+                    break;
+                }
+                case QUIT: {
+                    printStream.println("Session closed. You left the chat.");
+                    session.close(true);
+                    break;
+                }
+                case LIST: case HELP: {
+                    printStream.println(value);
+                    break;
+                }
+                default: {
+                    printStream.println(value);
+                    break;
+                }
+            }
+        } else {
+            printStream.println("Server send an error! " + value);
+            switch (cmd) {
+                case LOGIN: {
+                    // логин не удался, повторяем
+                    // FIXME эта хуйня не работает!
+                    this.doLogin();
+                    break;
+                }
+            }
+        }
+
+    }
+
+    @Override
+    public void exceptionCaught(IoSession session, Throwable cause) {
+        cause.printStackTrace();
+        session.close(true);
     }
 }

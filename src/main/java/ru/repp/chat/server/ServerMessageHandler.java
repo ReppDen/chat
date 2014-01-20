@@ -1,5 +1,6 @@
 package ru.repp.chat.server;
 
+import com.google.common.base.Joiner;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.slf4j.Logger;
@@ -53,7 +54,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
         LOG.info(completeMsg);
         String[] parts = completeMsg.split(" ", 2);
         String command = parts[0];
-        String value = parts[1];
+        String value = parts.length > 1 ? parts[1]:"";
 
         Command cmd = Command.formString(command);
         String user = (String) session.getAttribute("user");
@@ -98,7 +99,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
                 break;
             }
             case LIST: {
-                session.write(Utils.makeCustomServerCmd(Command.HELP, Response.OK, "Here comes Users list"));
+                session.write(Utils.makeCustomServerCmd(Command.HELP, Response.OK, getUserList()));
                 break;
             }
             case SEND: default: {
@@ -110,6 +111,11 @@ public class ServerMessageHandler extends IoHandlerAdapter {
                 break;
             }
         }
+    }
+
+    private synchronized String getUserList() {
+        Joiner joiner = Joiner.on("; ").skipNulls();
+        return "Users in chat: " + joiner.join(users);
     }
 
     /**
