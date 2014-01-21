@@ -3,6 +3,7 @@ package ru.repp.chat.server;
 import com.google.common.base.Joiner;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ru.repp.chat.server.history.HistoryManager;
@@ -41,6 +42,11 @@ public class ServerMessageHandler extends IoHandlerAdapter {
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
         LOG.error("exceptionCaught", cause);
         cause.printStackTrace();
+        if (cause instanceof RecoverableProtocolDecoderException) {
+            // кривая комманда
+            session.write(Utils.makeCustomServerCmd(Command.SEND, Response.ERROR, "Command is not correct! Check length of message"));
+        }
+
     }
 
     @Override

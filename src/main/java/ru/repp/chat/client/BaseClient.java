@@ -1,9 +1,11 @@
 package ru.repp.chat.client;
 
+import org.apache.mina.core.RuntimeIoException;
 import org.apache.mina.core.future.ConnectFuture;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
+import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
 import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketConnector;
@@ -12,7 +14,10 @@ import ru.repp.chat.utils.Constants;
 import ru.repp.chat.utils.Response;
 import ru.repp.chat.utils.Utils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
@@ -60,9 +65,14 @@ public class BaseClient extends IoHandlerAdapter implements Client {
         // создаем сессию
         ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
         future.awaitUninterruptibly();
-        session = future.getSession();
-        session.getConfig().setUseReadOperation(true);
+        try {
+            session = future.getSession();
+            session.getConfig().setUseReadOperation(true);
+        } catch (RuntimeIoException ex) {
+            printStream.println("Can not connect to server " + host + ":" + port);
+        }
     }
+
 
     
     public boolean isConnected() {
@@ -71,14 +81,15 @@ public class BaseClient extends IoHandlerAdapter implements Client {
 
     
     public void stop() {
-        if (session != null) {
-//            session.getConfig().setUseReadOperation(false);
+        if (session != null && session.isConnected()) {
+            if (printStream != null && printStream != System.out) {
+                printStream.flush();
+                printStream.close();
+            }
+            printStream.println("You left the chat.");
             session.close(false).awaitUninterruptibly();
         }
-        if (printStream != null && printStream != System.out) {
-            printStream.flush();
-            printStream.close();
-        }
+
     }
 
     /**
@@ -130,17 +141,22 @@ public class BaseClient extends IoHandlerAdapter implements Client {
     }
 
     public String sendRawText(String msg) throws Exception {
-        session.write(msg).awaitUninterruptibly();
+        session.write(msg.trim()).awaitUninterruptibly();
         return (String) session.read().awaitUninterruptibly().getMessage();
     }
 
     public void doLogin() throws Exception {
         String msg;
         do {
-            printStream.println("Please your nickname (one word, english characters, numbers and \"_\" allowed)");
+            printStream.println("Please your nickname (one word, english characters, numbers and \"_\" allowed). Or type /quit to exit application");
             msg = inReader.readLine();
-        } while (!msg.matches("[A-Za-z0-9_]+"));
-        this.login(msg);
+        } while (!msg.matches("[A-Za-z0-9_]+") && !msg.toUpperCase().matches("/QUIT"));
+        if (msg.toUpperCase().matches("/QUIT")) {
+            this.stop();
+        } else {
+            this.login(msg);
+        }
+
     }
 
     @Override
@@ -163,8 +179,7 @@ public class BaseClient extends IoHandlerAdapter implements Client {
                     break;
                 }
                 case QUIT: {
-                    printStream.println("Session closed. You left the chat.");
-                    session.close(true);
+                   this.stop();
                     break;
                 }
                 case LIST: case HELP: {
@@ -178,21 +193,17 @@ public class BaseClient extends IoHandlerAdapter implements Client {
             }
         } else {
             printStream.println("Server send an error! " + value);
-            switch (cmd) {
-                case LOGIN: {
-                    // логин не удался, повторяем
-                    // FIXME эта хуйня не работает!
-                    this.doLogin();
-                    break;
-                }
-            }
         }
 
     }
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) {
-        cause.printStackTrace();
+        if (cause instanceof IOException) {
+            printStream.println("Error! Server connection interrupted" + cause.getMessage());
+        } else if (cause instanceof RecoverableProtocolDecoderException) {
+            printStream.println("Error! Server send incorrect command");
+        }
         session.close(true);
     }
 }

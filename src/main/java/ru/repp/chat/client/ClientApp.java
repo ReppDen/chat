@@ -19,10 +19,12 @@ public class ClientApp {
         c.connect(Constants.HOSTNAME, Constants.PORT);
 
         BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
-        String msg = null;
-        c.doLogin();
-        boolean keep = true;
-        while (keep) {
+        String msg;
+        do {
+            c.doLogin();
+        } while (!c.isLoggedIn());
+
+        while (c.isConnected()) {
             msg = inReader.readLine();
             if (!StringUtils.isBlank(msg)) {
                 if (Utils.matcheslinetCommonCommandPattern(msg)) {

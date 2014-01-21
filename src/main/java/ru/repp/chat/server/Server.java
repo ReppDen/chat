@@ -17,7 +17,7 @@ public interface Server {
     /**
      * старт сервера
      */
-    void start();
+    int start();
 
     IoHandlerAdapter getMessageHandler();
 

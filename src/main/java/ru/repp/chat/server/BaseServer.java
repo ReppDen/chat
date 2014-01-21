@@ -34,12 +34,13 @@ public class BaseServer implements Server{
     public BaseServer(int port) {
         this.port = port;
         acceptor = new NioSocketAcceptor();
+        acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
         messageHandler = new ServerMessageHandler(new MemoryHistoryManager());
     }
 
-    public void start() {
+    public int start() {
         try {
-            acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+
             acceptor.setHandler(getMessageHandler());
             acceptor.getSessionConfig().setReadBufferSize(2048);
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
@@ -47,8 +48,10 @@ public class BaseServer implements Server{
             acceptor.bind( new InetSocketAddress(port));
             setHistoryManager(new MemoryHistoryManager());
             getLogger().info("Server started. Port " + port);
+            return 1;
         } catch (IOException ex) {
             getLogger().error("Server startup failed", ex);
+            return 0;
         }
     }
 
