@@ -57,7 +57,7 @@ public class BaseClient extends IoHandlerAdapter implements Client{
     }
 
 
-    public void connect(String host, int port) {
+    public int connect(String host, int port) {
 
         // создаем сессию
         ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
@@ -65,8 +65,11 @@ public class BaseClient extends IoHandlerAdapter implements Client{
         try {
             session = future.getSession();
             session.getConfig().setUseReadOperation(true);
+            return 0;
         } catch (RuntimeIoException ex) {
             printStream.println("Can not connect to server " + host + ":" + port);
+            stop();
+            return 1;
         }
     }
 
@@ -202,5 +205,10 @@ public class BaseClient extends IoHandlerAdapter implements Client{
             printStream.println("Error! Server send incorrect command");
         }
         session.close(true);
+    }
+
+    @Override
+    public void sessionClosed(IoSession session) throws Exception {
+        printStream.println("Connection lost. Server is not available");
     }
 }

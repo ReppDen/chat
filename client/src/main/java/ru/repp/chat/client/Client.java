@@ -12,7 +12,7 @@ import java.io.IOException;
  * @since 1/19/14
  */
 public interface Client extends IoHandler {
-    void connect(String host, int port) throws Exception;
+    int connect(String host, int port) throws Exception;
 
     boolean isConnected() throws Exception;
 

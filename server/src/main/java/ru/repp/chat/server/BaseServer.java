@@ -48,10 +48,10 @@ public class BaseServer implements Server{
             acceptor.bind( new InetSocketAddress(port));
             setHistoryManager(new MemoryHistoryManager());
             getLogger().info("Server started. Port " + port);
-            return 1;
+            return 0;
         } catch (IOException ex) {
             getLogger().error("Server startup failed", ex);
-            return 0;
+            return 1;
         }
     }
 

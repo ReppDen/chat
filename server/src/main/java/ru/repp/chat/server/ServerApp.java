@@ -25,22 +25,36 @@ public class ServerApp {
         while (!stop) {
             cmd = inReader.readLine().toUpperCase();
             if (cmd.matches("START")) {
-                if (!s.isServerActive()) {
-                    System.out.println("Starting server");
-                    s.start();
-                } else {
-                    System.out.println("Server already started");
-                }
+               start(s);
             }
             if (cmd.matches("STOP")) {
-                System.out.println("Stopping server");
-                s.stop();
+                stop(s);
+
             }
 
             if (cmd.matches("QUIT")) {
                 stop = true;
             }
         }
-        s.stop();
+        stop(s);
+        System.exit(0);
+    }
+
+    private static void start(Server s) {
+        if (!s.isServerActive()) {
+            System.out.println("Starting server");
+            s.start();
+        } else {
+            System.out.println("Server already started");
+        }
+    }
+
+    private static void stop(Server s) {
+        if (s.isServerActive()) {
+            System.out.println("Stopping server");
+            s.stop();
+        } else {
+            System.out.println("Server already stopped");
+        }
     }
 }

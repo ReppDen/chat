@@ -5,6 +5,7 @@ import ru.repp.chat.utils.Constants;
 import ru.repp.chat.utils.Utils;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
@@ -15,14 +16,19 @@ import java.io.InputStreamReader;
  */
 public class ClientApp {
     public static void main(String[] args) throws Exception {
-        Client c = new BaseClient();
-        c.connect(Constants.HOSTNAME, Constants.PORT);
-
         BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
+
+        Client c = new BaseClient();
+        int connected = c.connect(Constants.HOSTNAME, Constants.PORT);
+
+        if (connected != 0) {
+            exitApp();
+        }
+
         String msg;
         do {
             c.doLogin();
-        } while (!c.isLoggedIn());
+        } while (c.isConnected() && !c.isLoggedIn());
 
         while (c.isConnected()) {
             msg = inReader.readLine();
@@ -37,6 +43,12 @@ public class ClientApp {
             }
         }
         c.stop();
+        exitApp();
+    }
+
+    private static void exitApp() throws IOException {
+        System.out.println("Press any key to exit");
+        System.in.read();
         System.exit(0);
     }
 
