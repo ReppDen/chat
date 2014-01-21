@@ -1,7 +1,6 @@
 package ru.repp.chat.client;
 
 import org.apache.mina.core.service.IoHandler;
-import org.apache.mina.core.session.IoSession;
 
 import java.io.IOException;
 
@@ -36,8 +35,6 @@ public interface Client extends IoHandler {
      * завершение работы клиента
      */
     void quit() throws Exception;
-
-    IoSession getSession() throws Exception;
 
     boolean isLoggedIn() throws Exception;
 

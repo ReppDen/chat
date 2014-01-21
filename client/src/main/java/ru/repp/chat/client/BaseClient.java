@@ -60,11 +60,9 @@ public class BaseClient extends IoHandlerAdapter implements Client{
     public int connect(String host, int port) {
 
         // создаем сессию
-        ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
-        future.awaitUninterruptibly();
         try {
-            session = future.getSession();
-            session.getConfig().setUseReadOperation(true);
+            session = getConnectFuture(host, port).getSession();
+            getSession().getConfig().setUseReadOperation(true);
             return 0;
         } catch (RuntimeIoException ex) {
             printStream.println("Can not connect to server " + host + ":" + port);
@@ -73,21 +71,26 @@ public class BaseClient extends IoHandlerAdapter implements Client{
         }
     }
 
+    protected ConnectFuture getConnectFuture(String host, int port) {
+        ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
+        future.awaitUninterruptibly();
+        return future;
+    }
 
 
     public boolean isConnected() {
-        return session != null && session.isConnected();
+        return getSession() != null && getSession().isConnected();
     }
 
 
     public void stop() {
-        if (session != null && session.isConnected()) {
+        if (isConnected()) {
             if (printStream != System.out) {
                 printStream.flush();
                 printStream.close();
             }
             printStream.println("You left the chat.");
-            session.close(false).awaitUninterruptibly();
+            getSession().close(false).awaitUninterruptibly();
         }
 
     }
@@ -108,7 +111,7 @@ public class BaseClient extends IoHandlerAdapter implements Client{
 
 
     public String getUserName() {
-        return session != null ? (String) session.getAttribute("user") : null;
+        return getSession() != null ? (String) getSession().getAttribute("user") : null;
     }
 
 
@@ -117,12 +120,12 @@ public class BaseClient extends IoHandlerAdapter implements Client{
     }
 
 
-    public IoSession getSession() {
+    protected IoSession getSession() {
         return session;
     }
 
     public boolean isLoggedIn() {
-        return session != null && session.getAttribute("user") != null;
+        return getSession() != null && getSession().getAttribute("user") != null;
     }
 
 
@@ -141,8 +144,8 @@ public class BaseClient extends IoHandlerAdapter implements Client{
     }
 
     public String sendRawText(String msg) throws Exception {
-        session.write(msg.trim()).awaitUninterruptibly();
-        return (String) session.read().awaitUninterruptibly().getMessage();
+        getSession().write(msg.trim()).awaitUninterruptibly();
+        return (String) getSession().read().awaitUninterruptibly().getMessage();
     }
 
     public void doLogin() throws Exception {

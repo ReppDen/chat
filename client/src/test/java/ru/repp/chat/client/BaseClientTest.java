@@ -1,190 +1,252 @@
-//package ru.repp.chat.client;
-//
-//import org.hamcrest.CoreMatchers;
-//import org.junit.After;
-//import org.junit.Assert;
-//import org.junit.Before;
-//import org.junit.Test;
-//import ru.repp.chat.client.mock.ServerMock;
-//import ru.repp.chat.server.Server;
-//import ru.repp.chat.utils.Command;
-//import ru.repp.chat.utils.Constants;
-//import ru.repp.chat.utils.Response;
-//import ru.repp.chat.utils.Utils;
-//
-//import java.io.BufferedOutputStream;
-//import java.io.File;
-//import java.io.FileOutputStream;
-//import java.io.PrintStream;
-//import java.nio.channels.UnresolvedAddressException;
-//
-//
-///**
-// * Тесты для клиента
-// * Проверяется корректность клиентских комманд, соединение с сервером
-// *
-// * @author @Drepp
-// * @since 14.01.14
-// */
-//public class BaseClientTest {
-//
-//
-//    Server server;
-//
-//    @Before
-//    public void startServer() {
-//        server = new ServerMock(Constants.PORT);
-//        server.start();
-//    }
-//
-//    @After
-//    public void stopServer() {
-//        this.server.stop();
-//    }
-//
-//    @Test
-//    public void testConnect() throws Exception {
-//        Client c = new BaseClient();
-//        Assert.assertFalse(c.isConnected());
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        Assert.assertTrue(c.isConnected());
-//        // cообщений не отправляллось
-//        Assert.assertEquals(server.getHistoryManager().getCount(), 0);
-//        c.stop();
-//        Assert.assertFalse(c.isConnected());
-//    }
-//
-//    @Test
-//    public void testStop()  throws Exception {
-//        Client c = new BaseClient();
-//        Assert.assertFalse(c.isConnected());
-//        c.stop();
-//        Assert.assertFalse(c.isConnected());
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        Assert.assertTrue(c.isConnected());
-//        c.stop();
-//        Assert.assertFalse(c.isConnected());
-//    }
-//
-//    @Test
-//    public void testLogin() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        String user = "Den";
-//        c.login(user);
-//        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LOGIN)));
-//        c.stop();
-//    }
-//
-//    @Test
-//    public void testConstructor() throws Exception {
-//        String fileName = "file.txt";
-//        Client c = new BaseClient(new PrintStream(new BufferedOutputStream(new FileOutputStream(fileName))), null); // TODO дописать тест
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        c.login("Den");
-//        c.stop();
-//        File file = new File(fileName);
-//        Assert.assertNotEquals(file.length(), 0);
-//        Assert.assertTrue(file.delete());
-//
-//    }
-//
-//    @Test
-//    public void testConnectFail() throws Exception {
-//        Client c = new BaseClient();
-//        Assert.assertFalse(c.isConnected());
-//
-//        Throwable t = null;
-//        try {
-//            c.connect("non-existing-host", Constants.PORT);
-//        } catch (Throwable ex) {
-//            t = ex;
-//        }
-//        Assert.assertNotNull(t);
-//        Assert.assertThat(t, CoreMatchers.instanceOf(UnresolvedAddressException.class));
-//        Assert.assertFalse(c.isConnected());
-//
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        c.stop();
-//    }
-//
-//
-//    @Test
-//    public void testLogedIn() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        String user = "Den";
-//        Assert.assertFalse(c.isLoggedIn());
-//        c.login(user);
-//        Assert.assertTrue(c.isLoggedIn());
-//        c.stop();
-//    }
-//
-//
-//
-//    @Test
-//    public void testQuit() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        Assert.assertTrue(c.isConnected());
-//        c.quit();
-//        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.QUIT)));
-//        c.stop();
-//    }
-//
-//    @Test
-//    public void testGetUserName() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        String user = "Den";
-//        c.login(user);
-//        Assert.assertEquals(c.getUserName(), user);
-//        c.stop();
-//    }
-//
-//    @Test
-//    public void testHelp() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        c.login("Den");
-//        c.help();
-//        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.HELP)));
-//        c.stop();
-//    }
-//
-//    @Test
-//    public void testList() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        c.login("Den");
-//        c.list();
-//        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.LIST)));
-//        c.stop();
-//    }
-//
-//    @Test
-//    public void testSend() throws Exception {
-//        Client c = new BaseClient();
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//        c.login("Den");
-//        c.send("Hello");
-//        Assert.assertTrue(server.getHistoryManager().getLast(1).get(0).matches(Utils.getClinetCommandPattern(Command.SEND)));
-//        c.stop();
-//    }
-//
-//    @Test
-//    public void testLogin2() throws Exception {
-//        Client c = new BaseClient();
-//
-//        c.connect(Constants.HOSTNAME, Constants.PORT);
-//
-//        String name = "Den";
-//        String res = c.login(name);
-//
-//        Assert.assertEquals(Utils.makeCustomServerCmd(Command.LOGIN, Response.OK, name),res);
-//
-//        c.stop();
-//
-//    }
-//
-//}
+package ru.repp.chat.client;
+
+import junit.framework.TestCase;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.mina.core.RuntimeIoException;
+import org.apache.mina.core.future.CloseFuture;
+import org.apache.mina.core.future.ConnectFuture;
+import org.apache.mina.core.future.ReadFuture;
+import org.apache.mina.core.future.WriteFuture;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.session.IoSessionConfig;
+import org.junit.Assert;
+import org.junit.Test;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import ru.repp.chat.utils.Command;
+import ru.repp.chat.utils.Constants;
+import ru.repp.chat.utils.Utils;
+
+import java.io.BufferedReader;
+import java.io.PrintStream;
+
+/**
+ * Клиентские тесты
+ *
+ * @author den
+ * @since 1/22/14
+ */
+public class BaseClientTest extends TestCase {
+    @Test
+    public void testConnect() throws Exception {
+        final ConnectFuture f = Mockito.mock(ConnectFuture.class);
+        final IoSession s = Mockito.mock(IoSession.class);
+        final IoSessionConfig conf = Mockito.mock(IoSessionConfig.class);
+        Client c = new BaseClient() {
+            @Override
+            protected ConnectFuture getConnectFuture(String host, int port) {
+                return f;
+            }
+        };
+
+        Mockito.when(f.getSession()).thenReturn(s);
+        Mockito.when(s.getConfig()).thenReturn(conf);
+        Assert.assertEquals(c.connect(Constants.HOSTNAME, Constants.PORT), 0);
+    }
+
+    @Test
+    public void testConnectFail() throws Exception {
+        final ConnectFuture f = Mockito.mock(ConnectFuture.class);
+        Client c = new BaseClient() {
+            @Override
+            protected ConnectFuture getConnectFuture(String host, int port) {
+                return f;
+            }
+        };
+
+        Mockito.when(f.getSession()).thenThrow(RuntimeIoException.class);
+        Assert.assertEquals(c.connect(Constants.HOSTNAME, Constants.PORT), 1);
+    }
+
+    @Test
+    public void testIsConnected() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        Client c = new BaseClient() {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+
+        Mockito.when(sessionMock.isConnected()).thenReturn(true);
+        Assert.assertTrue(c.isConnected());
+    }
+
+    @Test
+    public void testIsConnectedSessionNull() throws Exception {
+        Client c = new BaseClient() {
+            public IoSession getSession() {
+                return null;
+            }
+        };
+        Assert.assertFalse(c.isConnected());
+    }
+
+    @Test
+    public void testIsConnectedNotConnected() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        Client c = new BaseClient() {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+
+        Mockito.when(sessionMock.isConnected()).thenReturn(false);
+        Assert.assertFalse(c.isConnected());
+    }
+
+    @Test
+    public void testStopClinetConnected() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        PrintStream out = Mockito.mock(PrintStream.class);
+        BufferedReader in = Mockito.mock(BufferedReader.class);
+
+        Client c = new BaseClient(out, in) {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+        Mockito.when(sessionMock.isConnected()).thenReturn(true);
+        Mockito.when(sessionMock.close(false)).thenReturn(Mockito.mock(CloseFuture.class));
+        Mockito.when(sessionMock.close(false).awaitUninterruptibly()).then(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Mockito.when(sessionMock.isConnected()).thenReturn(false);
+                return null;
+            }
+        });
+
+        Assert.assertTrue(c.isConnected());
+        c.stop();
+        Assert.assertFalse(c.isConnected());
+    }
+
+    @Test
+    public void testStopClinetNotConnected() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        PrintStream out = Mockito.mock(PrintStream.class);
+        BufferedReader in = Mockito.mock(BufferedReader.class);
+
+        Client c = new BaseClient(out, in) {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+        Mockito.when(sessionMock.isConnected()).thenReturn(false);
+        Mockito.when(sessionMock.close(false)).thenReturn(Mockito.mock(CloseFuture.class));
+        Mockito.when(sessionMock.close(false).awaitUninterruptibly()).then(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                Mockito.when(sessionMock.isConnected()).thenReturn(false);
+                return null;
+            }
+        });
+
+        Assert.assertFalse(c.isConnected());
+        c.stop();
+        Assert.assertFalse(c.isConnected());
+    }
+
+    @Test
+    public void testLogin() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        Client c = new BaseClient() {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+
+        String name = "Den";
+        final StringBuilder stringBuilder = new StringBuilder();
+        Mockito.when(sessionMock.write(Mockito.anyString())).then(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                stringBuilder.append(invocation.getArguments()[0]).toString();
+                return Mockito.mock(WriteFuture.class);
+            }
+        });
+        Mockito.when(sessionMock.write(Mockito.anyString()).awaitUninterruptibly()).thenReturn(null);
+        Mockito.when(sessionMock.read()).thenReturn(Mockito.mock(ReadFuture.class));
+        Mockito.when(sessionMock.read().awaitUninterruptibly()).thenReturn(Mockito.mock(ReadFuture.class));
+        Mockito.when(sessionMock.read().awaitUninterruptibly().getMessage()).then(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                return stringBuilder.toString();
+            }
+        });
+
+        String loginRes = c.login(name);
+        Assert.assertEquals(loginRes, stringBuilder.toString());
+        Assert.assertTrue(loginRes.matches(Utils.getClinetCommandPattern(Command.LOGIN)));
+
+    }
+
+    @Test
+    public void testGetUserName() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        Client c = new BaseClient() {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+        String name = "den";
+        Mockito.when(sessionMock.getAttribute("user")).thenReturn(name);
+
+        Assert.assertEquals(c.getUserName(), name);
+        Mockito.when(sessionMock.getAttribute("user")).thenReturn(StringUtils.reverse(name));
+        Assert.assertNotEquals(c.getUserName(), name);
+    }
+
+    @Test
+    public void testGetUserNameIsNull() throws Exception {
+        final IoSession sessionMock = Mockito.mock(IoSession.class);
+        Client c = new BaseClient() {
+            public IoSession getSession() {
+                return sessionMock;
+            }
+        };
+        Mockito.when(sessionMock.getAttribute("user")).thenReturn(null);
+
+        Assert.assertNull(c.getUserName());
+    }
+
+    @Test
+    public void testQuit() throws Exception {
+
+    }
+
+    @Test
+    public void testGetSession() throws Exception {
+
+    }
+
+    @Test
+    public void testIsLoggedIn() throws Exception {
+
+    }
+
+    @Test
+    public void testHelp() throws Exception {
+
+    }
+
+    @Test
+    public void testList() throws Exception {
+
+    }
+
+    @Test
+    public void testSend() throws Exception {
+
+    }
+
+    @Test
+    public void testSendRawText() throws Exception {
+
+    }
+
+    @Test
+    public void testDoLogin() throws Exception {
+
+    }
+}
