@@ -6,7 +6,15 @@
 
     <groupId>ru.repp</groupId>
     <artifactId>chat</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <version>1.0</version>
+    <modules>
+        <module>client</module>
+        <module>server</module>
+        <module>utils</module>
+    </modules>
+
+
 
     <dependencies>
         <dependency>
@@ -49,10 +57,11 @@
 
 
 
-
-
     </dependencies>
 
+    <properties>
+        <gwt.version>2.3.0</gwt.version>
+    </properties>
     <build>
             <plugins>
                 <plugin>
@@ -87,6 +96,24 @@
                         <finalName>Chat</finalName>
                         <appendAssemblyId>false</appendAssemblyId>
                     </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>properties-maven-plugin</artifactId>
+                    <version>1.0-alpha-2</version>
+                    <executions>
+                        <execution>
+                            <phase>initialize</phase>
+                            <goals>
+                                <goal>read-project-properties</goal>
+                            </goals>
+                            <configuration>
+                                <files>
+                                    <file>${project.basedir}/common.properties</file>
+                                </files>
+                            </configuration>
+                        </execution>
+                    </executions>
                 </plugin>
             </plugins>
     </build>
