@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MemoryHistoryManager implements HistoryManager{
 
-    List<String> store;
+    private final List<String> store;
 
     public MemoryHistoryManager() {
         store = new LinkedList<String>();

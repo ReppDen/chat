@@ -9,42 +9,37 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>client</artifactId>
-    <version>1.0</version>
+    <artifactId>loadTest</artifactId>
 
     <dependencies>
         <dependency>
             <groupId>ru.repp</groupId>
-            <artifactId>utils</artifactId>
+            <artifactId>client</artifactId>
             <version>1.0</version>
+            <classifier>jar-with-dependencies</classifier>
+        </dependency>
+        <dependency>
+            <groupId>ru.repp</groupId>
+            <artifactId>server</artifactId>
+            <version>1.0</version>
+            <classifier>jar-with-dependencies</classifier>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+
             <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>make-my-jar-with-dependencies</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <mainClass>ru.repp.chat.client.ClientApp</mainClass>
+                            <mainClass>ru.repp.chat.loadTest.LoadTest</mainClass>
                         </manifest>
                     </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                    <finalName>Client v${version}</finalName>
-                    <appendAssemblyId>false</appendAssemblyId>
+                    <finalName>Load Testing v${project.version}</finalName>
                 </configuration>
             </plugin>
             <plugin>
@@ -73,4 +68,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

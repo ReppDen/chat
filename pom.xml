@@ -12,6 +12,7 @@
         <module>utils</module>
         <module>client</module>
         <module>server</module>
+        <module>loadTest</module>
     </modules>
 
 

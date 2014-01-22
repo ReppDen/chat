@@ -14,7 +14,7 @@ import java.io.InputStreamReader;
  * @author den
  * @since 1/12/14
  */
-public class ClientApp {
+class ClientApp {
     public static void main(String[] args) throws Exception {
         BufferedReader inReader = new BufferedReader(new InputStreamReader(System.in));
 

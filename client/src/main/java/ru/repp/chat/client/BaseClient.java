@@ -28,10 +28,10 @@ import java.util.concurrent.Executors;
  */
 public class BaseClient extends IoHandlerAdapter implements Client {
 
-    private BufferedReader inReader;
-    private NioSocketConnector connector;
+    private final BufferedReader inReader;
+    private final NioSocketConnector connector;
     private IoSession session;
-    private PrintStream printStream;
+    private final PrintStream printStream;
 
     /**
      * Создает клиента чата <br/>
@@ -73,7 +73,7 @@ public class BaseClient extends IoHandlerAdapter implements Client {
         }
     }
 
-    protected ConnectFuture getConnectFuture(String host, int port) {
+    ConnectFuture getConnectFuture(String host, int port) {
         ConnectFuture future = connector.connect(new InetSocketAddress(host, port));
         future.awaitUninterruptibly();
         return future;
@@ -103,7 +103,7 @@ public class BaseClient extends IoHandlerAdapter implements Client {
      * @param cmd комманда
      * @param arg аргумент
      */
-    protected String sendCustomCmd(Command cmd, Object arg) throws Exception {
+    String sendCustomCmd(Command cmd, Object arg) throws Exception {
         return sendRawText(Utils.makeCustomClientCmd(cmd, arg));
     }
 
@@ -123,7 +123,7 @@ public class BaseClient extends IoHandlerAdapter implements Client {
     }
 
 
-    protected IoSession getSession() {
+    IoSession getSession() {
         return session;
     }
 
@@ -146,7 +146,7 @@ public class BaseClient extends IoHandlerAdapter implements Client {
         return sendCustomCmd(Command.SEND, msg);
     }
 
-    public String sendRawText(String msg) throws Exception {
+    public String sendRawText(String msg) {
         getSession().write(msg.trim()).awaitUninterruptibly();
         return (String) getSession().read().awaitUninterruptibly().getMessage();
     }

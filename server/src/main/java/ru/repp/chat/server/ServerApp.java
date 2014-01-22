@@ -12,7 +12,7 @@ import java.io.InputStreamReader;
  * @author den
  * @since  1/12/14
  */
-public class ServerApp {
+class ServerApp {
 
 
     public static void main(String[] args) throws IOException {

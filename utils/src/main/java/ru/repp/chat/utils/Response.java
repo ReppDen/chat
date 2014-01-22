@@ -11,7 +11,7 @@ public enum Response {
     OK("OK"),
     ERROR("ERROR");
 
-    private String responseText;
+    private final String responseText;
 
     @Override
     public String toString() {

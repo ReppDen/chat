@@ -6,6 +6,7 @@ import org.apache.mina.core.session.IdleStatus;
 import org.apache.mina.core.session.IoSession;
 import org.apache.mina.filter.codec.ProtocolCodecFilter;
 import org.apache.mina.filter.codec.textline.TextLineCodecFactory;
+import org.apache.mina.filter.executor.ExecutorFilter;
 import org.apache.mina.transport.socket.nio.NioSocketAcceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,6 @@ import ru.repp.chat.server.history.MemoryHistoryManager;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
-import java.util.Map;
 
 /**
  * Сервер чата
@@ -25,20 +25,26 @@ import java.util.Map;
  */
 public class BaseServer implements Server{
 
-    private int port;
+    private final int port;
+
     IoAcceptor acceptor;
-    HistoryManager historyManager;
+    private HistoryManager historyManager;
     private static final Logger LOG = LoggerFactory.getLogger(BaseServer.class);
-    private IoHandlerAdapter messageHandler;
+    private final IoHandlerAdapter messageHandler;
 
     public BaseServer(int port) {
         this.port = port;
         acceptor = new NioSocketAcceptor();
         acceptor.getFilterChain().addLast("codec", new ProtocolCodecFilter(new TextLineCodecFactory(Charset.forName("UTF-8"))));
+        acceptor.getFilterChain().addLast("executor", new ExecutorFilter(1000));
         messageHandler = new ServerMessageHandler(new MemoryHistoryManager());
     }
 
     public int start() {
+        if (acceptor.isActive()) {
+            // нельзя натсраивать аццептор, пока он активен
+            return 1;
+        }
         try {
 
             acceptor.setHandler(getMessageHandler());
@@ -46,32 +52,22 @@ public class BaseServer implements Server{
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
             acceptor.getSessionConfig().setUseReadOperation(true);
             acceptor.bind( new InetSocketAddress(port));
-            setHistoryManager(new MemoryHistoryManager());
-            getLogger().info("Server started. Port " + port);
+            historyManager = new MemoryHistoryManager();
+            LOG.info("Server started. Port " + port);
             return 0;
         } catch (IOException ex) {
-            getLogger().error("Server startup failed", ex);
+            LOG.error("Server startup failed", ex);
             return 1;
         }
     }
 
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    
-    public IoHandlerAdapter getMessageHandler() {
+    private IoHandlerAdapter getMessageHandler() {
         return messageHandler;
-    }
-
-    
-    public void setMessageHandler(IoHandlerAdapter messageHandler) {
-        this.messageHandler = messageHandler;
     }
 
     public void stop() {
         acceptor.unbind();
-        getLogger().info("Server stopped");
+        LOG.info("Server stopped");
     }
 
     /**
@@ -107,13 +103,4 @@ public class BaseServer implements Server{
         return historyManager;
     }
 
-    
-    public void setHistoryManager(HistoryManager manager) {
-        historyManager = manager;
-    }
-
-    
-    public Map<Long, IoSession> getSessions() {
-        return acceptor.getManagedSessions();
-    }
 }

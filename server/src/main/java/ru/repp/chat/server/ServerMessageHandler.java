@@ -22,7 +22,7 @@ import java.util.Set;
  * @author den
  * @since 1/12/14
  */
-public class ServerMessageHandler extends IoHandlerAdapter {
+class ServerMessageHandler extends IoHandlerAdapter {
 
     private final Set<IoSession> sessions = Collections
             .synchronizedSet(new HashSet<IoSession>());
@@ -129,7 +129,7 @@ public class ServerMessageHandler extends IoHandlerAdapter {
      * {command} {status} {text}
      * @param message транслируемое сообщение
      */
-    public void broadcast(String message) {
+    void broadcast(String message) {
         synchronized (sessions) {
             for (IoSession session : sessions) {
                 if (session.isConnected()) {

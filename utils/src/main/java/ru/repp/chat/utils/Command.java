@@ -14,16 +14,12 @@ public enum Command {
     HELP("/HELP", 3),
     LIST("/LIST", 4);
 
-    private String cmdText;
-    private int code;
+    private final String cmdText;
+    private final int code;
 
     @Override
     public String toString() {
         return cmdText;
-    }
-
-    public final int getCode() {
-        return code;
     }
 
     Command(String s, int code) {

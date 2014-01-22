@@ -11,14 +11,14 @@ import java.io.IOException;
  * @since 1/19/14
  */
 public interface Client extends IoHandler {
-    int connect(String host, int port) throws Exception;
+    int connect(String host, int port);
 
-    boolean isConnected() throws Exception;
+    boolean isConnected();
 
     /**
      * Останавливает клиента
      */
-    void stop() throws Exception;
+    void stop();
 
     /**
      * отправка комманды авторизации
@@ -29,14 +29,14 @@ public interface Client extends IoHandler {
     /**
      * @return Возворащает имя авторизованног опользователя, null если не авторизован
      */
-    String getUserName() throws Exception;
+    String getUserName();
 
     /**
      * завершение работы клиента
      */
     String quit() throws Exception;
 
-    boolean isLoggedIn() throws Exception;
+    boolean isLoggedIn();
 
     String help() throws Exception;
 
@@ -44,7 +44,7 @@ public interface Client extends IoHandler {
 
     String send(String msg) throws Exception;
 
-    String sendRawText(String msg) throws Exception;
+    String sendRawText(String msg);
 
     /**
      * запустить интерактивную процедуру логина
