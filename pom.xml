@@ -9,12 +9,36 @@
     <packaging>pom</packaging>
     <version>1.0</version>
     <modules>
+        <module>utils</module>
         <module>client</module>
         <module>server</module>
-        <module>utils</module>
     </modules>
 
+
+    <dependencyManagement>
+        <dependencies>
+            <!--
+   Alfresco Dependencies. Use this dependency to switch SHARE version
+  -->
+            <!--
+                      All provided libs (as contained in the war dependency) but useful for
+                      development (e.g. IDE configuration)
+                  -->
+            <dependency>
+                <groupId>ru.repp</groupId>
+                <artifactId>client</artifactId>
+                <version>1.0</version>
+            </dependency>
+            <dependency>
+                <groupId>ru.repp</groupId>
+                <artifactId>server</artifactId>
+                <version>1.0</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <dependencies>
+
         <dependency>
             <groupId>org.apache.mina</groupId>
             <artifactId>mina-core</artifactId>
@@ -65,36 +89,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.16</version>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-artifact</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>copy</goal>
-                        </goals>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>client</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>${project.groupId}</groupId>
-                                    <artifactId>server</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-
-                            </artifactItems>
-                            <outputDirectory>target/apps</outputDirectory>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 
