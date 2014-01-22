@@ -30,7 +30,7 @@ public class Utils {
      * @param arg аргумент
      */
     public static String makeCustomClientCmd(Command cmd, Object arg) {
-        return cmd.toString() + " " + arg.toString();
+        return cmd.toString() + " " + arg;
     }
 
     public static boolean matcheslinetCommonCommandPattern(String msg) {

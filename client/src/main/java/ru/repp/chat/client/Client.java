@@ -34,15 +34,15 @@ public interface Client extends IoHandler {
     /**
      * завершение работы клиента
      */
-    void quit() throws Exception;
+    String quit() throws Exception;
 
     boolean isLoggedIn() throws Exception;
 
-    void help() throws Exception;
+    String help() throws Exception;
 
-    void list() throws Exception;
+    String list() throws Exception;
 
-    void send(String msg) throws Exception;
+    String send(String msg) throws Exception;
 
     String sendRawText(String msg) throws Exception;
 

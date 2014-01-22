@@ -100,7 +100,7 @@ public class BaseClient extends IoHandlerAdapter implements Client{
      * @param cmd комманда
      * @param arg аргумент
      */
-    private String sendCustomCmd(Command cmd, Object arg) throws Exception {
+    protected String sendCustomCmd(Command cmd, Object arg) throws Exception {
         return sendRawText(Utils.makeCustomClientCmd(cmd, arg));
     }
 
@@ -115,8 +115,8 @@ public class BaseClient extends IoHandlerAdapter implements Client{
     }
 
 
-    public void quit() throws Exception {
-        sendCustomCmd(Command.QUIT, null);
+    public String quit() throws Exception {
+         return sendCustomCmd(Command.QUIT, null);
     }
 
 
@@ -129,18 +129,18 @@ public class BaseClient extends IoHandlerAdapter implements Client{
     }
 
 
-    public void help() throws Exception {
-        sendCustomCmd(Command.HELP, null);
+    public String help() throws Exception {
+        return sendCustomCmd(Command.HELP, null);
     }
 
 
-    public void list() throws Exception {
-        sendCustomCmd(Command.LIST, null);
+    public String list() throws Exception {
+        return sendCustomCmd(Command.LIST, null);
     }
 
 
-    public void send(String msg) throws Exception {
-        sendCustomCmd(Command.SEND, msg);
+    public String send(String msg) throws Exception {
+        return sendCustomCmd(Command.SEND, msg);
     }
 
     public String sendRawText(String msg) throws Exception {
