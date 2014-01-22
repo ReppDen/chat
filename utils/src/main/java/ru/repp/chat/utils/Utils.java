@@ -33,7 +33,7 @@ public class Utils {
         return cmd.toString() + " " + arg;
     }
 
-    public static boolean matcheslinetCommonCommandPattern(String msg) {
+    public static boolean matchesClinetCommonCommandPattern(String msg) {
         return msg.matches("^/\\w+(\\s\\w+)*$");
     }
 }

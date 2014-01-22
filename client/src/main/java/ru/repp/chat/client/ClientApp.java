@@ -33,7 +33,7 @@ public class ClientApp {
         while (c.isConnected()) {
             msg = inReader.readLine();
             if (!StringUtils.isBlank(msg)) {
-                if (Utils.matcheslinetCommonCommandPattern(msg)) {
+                if (Utils.matchesClinetCommonCommandPattern(msg)) {
                     // сообщение содержит комманду
                     c.sendRawText(msg);
                 } else {
