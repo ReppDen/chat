@@ -311,7 +311,7 @@ public class BaseClientTest {
     @Test
     public void testDoLogin() throws Exception {
         PrintStream out = Mockito.mock(PrintStream.class);
-        BufferedReader in = Mockito.spy(new BufferedReader(new FileReader("client/src/test/resources/testDoLogin.txt")));
+        BufferedReader in = Mockito.spy(new BufferedReader(new FileReader("src/test/resources/testDoLogin.txt")));
         Client c = Mockito.spy(new BaseClient(out, in));
 
 
@@ -328,7 +328,7 @@ public class BaseClientTest {
     @Test
     public void testDoLoginWrongNickNames() throws Exception {
         PrintStream out = Mockito.mock(PrintStream.class);
-        BufferedReader in = Mockito.spy(new BufferedReader(new FileReader("client/src/test/resources/testDoLoginWrongNickNames.txt")));
+        BufferedReader in = Mockito.spy(new BufferedReader(new FileReader("src/test/resources/testDoLoginWrongNickNames.txt")));
         Client c = Mockito.spy(new BaseClient(out, in));
 
         Mockito.doReturn(null).when(c).login(Mockito.anyString());
@@ -345,7 +345,7 @@ public class BaseClientTest {
     @Test
     public void testDoLoginQuit() throws Exception {
         PrintStream out = Mockito.mock(PrintStream.class);
-        BufferedReader in = Mockito.spy(new BufferedReader(new FileReader("client/src/test/resources/testDoLoginQuit.txt")));
+        BufferedReader in = Mockito.spy(new BufferedReader(new FileReader("src/test/resources/testDoLoginQuit.txt")));
         Client c = Mockito.spy(new BaseClient(out, in));
 
         Mockito.doReturn(null).when(c).login(Mockito.anyString());
