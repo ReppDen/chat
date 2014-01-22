@@ -26,24 +26,26 @@ import java.util.concurrent.Executors;
  * @author @Drepp
  * @since 21.01.14
  */
-public class BaseClient extends IoHandlerAdapter implements Client{
+public class BaseClient extends IoHandlerAdapter implements Client {
 
     private BufferedReader inReader;
     private NioSocketConnector connector;
     private IoSession session;
     private PrintStream printStream;
+
     /**
      * Создает клиента чата <br/>
      * по умолчанию выводит все сообщения в System.out
      */
     public BaseClient() {
-        this(System.out,  new BufferedReader(new InputStreamReader(System.in)));
+        this(System.out, new BufferedReader(new InputStreamReader(System.in)));
     }
 
     /**
      * Создает клиента чата
+     *
      * @param printStream поток, в который будут записываться сообщения клиента
-     * @param inReader поток, откуда считываются водные данные
+     * @param inReader    поток, откуда считываются водные данные
      */
     public BaseClient(PrintStream printStream, BufferedReader inReader) {
         this.printStream = printStream;
@@ -97,6 +99,7 @@ public class BaseClient extends IoHandlerAdapter implements Client{
 
     /**
      * посылает указанную комманду серверу
+     *
      * @param cmd комманда
      * @param arg аргумент
      */
@@ -116,7 +119,7 @@ public class BaseClient extends IoHandlerAdapter implements Client{
 
 
     public String quit() throws Exception {
-         return sendCustomCmd(Command.QUIT, null);
+        return sendCustomCmd(Command.QUIT, null);
     }
 
 
@@ -185,7 +188,8 @@ public class BaseClient extends IoHandlerAdapter implements Client{
                     this.stop();
                     break;
                 }
-                case LIST: case HELP: {
+                case LIST:
+                case HELP: {
                     printStream.println(value);
                     break;
                 }
@@ -197,7 +201,6 @@ public class BaseClient extends IoHandlerAdapter implements Client{
         } else {
             printStream.println("Server send an error! " + value);
         }
-
     }
 
     @Override
