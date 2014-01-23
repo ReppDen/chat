@@ -3,7 +3,7 @@ package ru.repp.chat.server;
 import ru.repp.chat.server.history.HistoryManager;
 
 /**
- * Интерфейс взаимодействия с сервером
+ * Интерфейс сервера
  *
  * @author den
  * @since 1/18/14

@@ -23,6 +23,8 @@ import java.nio.charset.Charset;
 import java.util.concurrent.Executors;
 
 /**
+ * базовая имплементация клиента
+ *
  * @author @Drepp
  * @since 21.01.14
  */

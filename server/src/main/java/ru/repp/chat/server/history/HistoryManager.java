@@ -12,12 +12,14 @@ public interface HistoryManager {
 
     /**
      * Добавить сообщение в историю
+     *
      * @param msg сообщение
      */
     public void add(String msg);
 
     /**
      * Получить последние N сообщений
+     *
      * @return количество сообещний
      */
     public List<String> getLast(int n);

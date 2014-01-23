@@ -23,7 +23,7 @@ import java.nio.charset.Charset;
  * @author @Drepp
  * @since 14.01.14
  */
-public class BaseServer implements Server{
+public class BaseServer implements Server {
 
     private final int port;
 
@@ -51,7 +51,7 @@ public class BaseServer implements Server{
             acceptor.getSessionConfig().setReadBufferSize(2048);
             acceptor.getSessionConfig().setIdleTime(IdleStatus.BOTH_IDLE, 10);
             acceptor.getSessionConfig().setUseReadOperation(true);
-            acceptor.bind( new InetSocketAddress(port));
+            acceptor.bind(new InetSocketAddress(port));
             historyManager = new MemoryHistoryManager();
             LOG.info("Server started. Port " + port);
             return 0;
@@ -91,14 +91,13 @@ public class BaseServer implements Server{
      */
     public int getAuthorizedClientsCount() {
         int count = 0;
-        for (IoSession s :acceptor.getManagedSessions().values()) {
+        for (IoSession s : acceptor.getManagedSessions().values()) {
             count += s.getAttribute("user") != null ? 1 : 0;
         }
         return count;
     }
 
 
-    
     public HistoryManager getHistoryManager() {
         return historyManager;
     }

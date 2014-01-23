@@ -5,10 +5,11 @@ import java.util.List;
 
 /**
  * Менеджер истории, хранит все в памяти
+ *
  * @author @Drepp
  * @since 14.01.14
  */
-public class MemoryHistoryManager implements HistoryManager{
+public class MemoryHistoryManager implements HistoryManager {
 
     private List<String> store;
 
@@ -22,10 +23,10 @@ public class MemoryHistoryManager implements HistoryManager{
 
     public List<String> getLast(int n) {
         if (n <= 0) {
-            throw  new IllegalArgumentException("Count must be bigger than zero");
+            throw new IllegalArgumentException("Count must be bigger than zero");
         }
         int start = store.size() - n >= 0 ? store.size() - n : 0;
-        store = store.subList(start,store.size());
+        store = store.subList(start, store.size());
         return store;
     }
 

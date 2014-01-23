@@ -5,7 +5,7 @@ import org.apache.mina.core.service.IoHandler;
 import java.io.IOException;
 
 /**
- * Здесь будет ваша реклама
+ * интерфейс клиента чата
  *
  * @author den
  * @since 1/19/14
@@ -22,6 +22,7 @@ public interface Client extends IoHandler {
 
     /**
      * отправка комманды авторизации
+     *
      * @param name имя пользователя
      */
     String login(String name) throws Exception;
@@ -48,6 +49,7 @@ public interface Client extends IoHandler {
 
     /**
      * запустить интерактивную процедуру логина
+     *
      * @throws IOException
      */
     void doLogin() throws Exception;

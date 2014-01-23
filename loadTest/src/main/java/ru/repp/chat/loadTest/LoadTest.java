@@ -14,7 +14,6 @@ import java.util.UUID;
 
 /**
  * Класс для запуска ручного нагрузончного тестирования
- * Соединяет, логинит 1000 клиентов, при вводу в консоль отправляет сообщение
  *
  * @author @Drepp
  * @since 22.01.14
@@ -35,10 +34,10 @@ public class LoadTest {
         String msg;
         do {
             System.out.println("Enter number of clients (more than zero)");
-            msg = br.readLine() ;
+            msg = br.readLine();
 
         } while (!msg.matches("\\d+") || Integer.valueOf(msg) <= 0);
-        Thread[] threads =  start(Integer.valueOf(msg));
+        Thread[] threads = start(Integer.valueOf(msg));
         System.out.println("Type \"stop\" to stop clients");
 
         do {
@@ -83,7 +82,7 @@ public class LoadTest {
 
                 while (keepWork()) {
                     String msg = "Hi everybody!";
-                    Thread.sleep((Math.abs(new Random().nextInt()) % 20) *1000);
+                    Thread.sleep((Math.abs(new Random().nextInt()) % 20) * 1000);
                     c.send(msg);
                 }
                 c.stop();

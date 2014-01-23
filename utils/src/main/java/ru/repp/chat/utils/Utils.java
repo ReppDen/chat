@@ -16,9 +16,10 @@ public class Utils {
 
     /**
      * формирует ответ сервера
-     * @param cmd комманда
+     *
+     * @param cmd      комманда
      * @param response ответа
-     * @param arg аргумент
+     * @param arg      аргумент
      */
     public static String makeCustomServerCmd(Command cmd, Response response, Object arg) {
         return cmd.toString() + " " + response.toString() + " " + arg.toString();
@@ -26,6 +27,7 @@ public class Utils {
 
     /**
      * формирует клиентскую комманду
+     *
      * @param cmd комманда
      * @param arg аргумент
      */

@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
  * Серверное приложение
  *
  * @author den
- * @since  1/12/14
+ * @since 1/12/14
  */
 class ServerApp {
 
@@ -25,11 +25,10 @@ class ServerApp {
         while (!stop) {
             cmd = inReader.readLine().toUpperCase();
             if (cmd.matches("START")) {
-               start(s);
+                start(s);
             }
             if (cmd.matches("STOP")) {
                 stop(s);
-
             }
 
             if (cmd.matches("QUIT")) {

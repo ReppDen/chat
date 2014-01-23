@@ -11,7 +11,7 @@ public class Constants {
     /**
      * Таймаут соединенеия
      */
-    public static final long CONNECT_TIMEOUT = 30*1000L;
+    public static final long CONNECT_TIMEOUT = 30 * 1000L;
 
     /**
      * Имя хоста по умолчанию

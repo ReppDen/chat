@@ -64,7 +64,7 @@ class ServerMessageHandler extends IoHandlerAdapter {
         LOG.info(completeMsg);
         String[] parts = completeMsg.split(" ", 2);
         String command = parts[0];
-        String value = parts.length > 1 ? parts[1]:"";
+        String value = parts.length > 1 ? parts[1] : "";
 
         Command cmd = Command.formString(command);
         String user = (String) session.getAttribute("user");
@@ -112,7 +112,8 @@ class ServerMessageHandler extends IoHandlerAdapter {
                 session.write(Utils.makeCustomServerCmd(Command.HELP, Response.OK, getUserList()));
                 break;
             }
-            case SEND: default: {
+            case SEND:
+            default: {
                 String chatMessage = user + ": " + value;
                 synchronized (historyManager) {
                     historyManager.add(chatMessage);
@@ -131,6 +132,7 @@ class ServerMessageHandler extends IoHandlerAdapter {
     /**
      * вещаем по всем клиентам в формате
      * {command} {status} {text}
+     *
      * @param message транслируемое сообщение
      */
     void broadcast(String message) {
