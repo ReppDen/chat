@@ -51,7 +51,7 @@ public class LoadTest {
         System.out.println("Stopped");
     }
 
-    Thread[] start(Integer count) throws InterruptedException {
+    Thread[] start(Integer count) {
         keepWork = true;
         Thread[] threads = new Thread[count];
         for (int i = 0; i < count; i++) {

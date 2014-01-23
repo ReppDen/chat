@@ -105,7 +105,7 @@ public class BaseClient extends IoHandlerAdapter implements Client {
      * @param cmd комманда
      * @param arg аргумент
      */
-    String sendCustomCmd(Command cmd, Object arg) throws Exception {
+    String sendCustomCmd(Command cmd, Object arg) {
         return sendRawText(Utils.makeCustomClientCmd(cmd, arg));
     }
 

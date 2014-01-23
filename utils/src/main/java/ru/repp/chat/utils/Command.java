@@ -8,23 +8,21 @@ package ru.repp.chat.utils;
  */
 public enum Command {
 
-    SEND("/SEND", 0),
-    LOGIN("/LOGIN", 1),
-    QUIT("/QUIT", 2),
-    HELP("/HELP", 3),
-    LIST("/LIST", 4);
+    SEND("/SEND"),
+    LOGIN("/LOGIN"),
+    QUIT("/QUIT"),
+    HELP("/HELP"),
+    LIST("/LIST");
 
     private final String cmdText;
-    private final int code;
 
     @Override
     public String toString() {
         return cmdText;
     }
 
-    Command(String s, int code) {
+    Command(String s) {
         this.cmdText = s;
-        this.code = code;
     }
 
     public static Command formString(String cmd) {
