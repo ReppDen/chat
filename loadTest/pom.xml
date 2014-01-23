@@ -16,22 +16,37 @@
             <groupId>ru.repp</groupId>
             <artifactId>client</artifactId>
             <version>1.0</version>
-            <classifier>jar-with-dependencies</classifier>
-        </dependency>
-        <dependency>
-            <groupId>ru.repp</groupId>
-            <artifactId>server</artifactId>
-            <version>1.0</version>
-            <classifier>jar-with-dependencies</classifier>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
 
+            <!--<plugin>-->
+                <!--<groupId>org.apache.maven.plugins</groupId>-->
+                <!--<artifactId>maven-jar-plugin</artifactId>-->
+                <!--<configuration>-->
+                    <!--<archive>-->
+                        <!--<manifest>-->
+                            <!--<addClasspath>true</addClasspath>-->
+                            <!--<mainClass>ru.repp.chat.loadTest.LoadTest</mainClass>-->
+                        <!--</manifest>-->
+                    <!--</archive>-->
+                    <!--<finalName>Load Testing v${project.version}</finalName>-->
+                <!--</configuration>-->
+            <!--</plugin>-->
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.4</version>
+                <executions>
+                    <execution>
+                        <id>make-my-jar-with-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
                 <configuration>
                     <archive>
                         <manifest>
@@ -39,7 +54,11 @@
                             <mainClass>ru.repp.chat.loadTest.LoadTest</mainClass>
                         </manifest>
                     </archive>
-                    <finalName>Load Testing v${project.version}</finalName>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                    <finalName>Load Testing v${version}</finalName>
+                    <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
             </plugin>
             <plugin>
@@ -61,7 +80,7 @@
                                 </artifactItem>
 
                             </artifactItems>
-                            <outputDirectory>../target/apps</outputDirectory>
+                            <outputDirectory>../apps</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>

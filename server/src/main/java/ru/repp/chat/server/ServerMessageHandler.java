@@ -3,6 +3,7 @@ package ru.repp.chat.server;
 import com.google.common.base.Joiner;
 import org.apache.mina.core.service.IoHandlerAdapter;
 import org.apache.mina.core.session.IoSession;
+import org.apache.mina.core.write.WriteToClosedSessionException;
 import org.apache.mina.filter.codec.RecoverableProtocolDecoderException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,7 @@ import ru.repp.chat.utils.Constants;
 import ru.repp.chat.utils.Response;
 import ru.repp.chat.utils.Utils;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -40,18 +42,20 @@ class ServerMessageHandler extends IoHandlerAdapter {
 
     @Override
     public void exceptionCaught(IoSession session, Throwable cause) throws Exception {
-        LOG.error("exceptionCaught", cause);
-        cause.printStackTrace();
         if (cause instanceof RecoverableProtocolDecoderException) {
             // кривая комманда
             session.write(Utils.makeCustomServerCmd(Command.SEND, Response.ERROR, "Command is not correct! Check length of message"));
+        } else if (cause instanceof WriteToClosedSessionException || cause instanceof IOException) {
+            LOG.error("Connection closed");
+        } else {
+            LOG.error("exceptionCaught", cause);
+            cause.printStackTrace();
         }
 
     }
 
     @Override
     public void sessionOpened(IoSession session) throws Exception {
-        LOG.info("new session");
     }
 
     @Override
@@ -142,11 +146,20 @@ class ServerMessageHandler extends IoHandlerAdapter {
     @Override
     public void sessionClosed(IoSession session) throws Exception {
         String user = (String) session.getAttribute("user");
-        users.remove(user);
-        sessions.remove(session);
+        removeUser(user);
+        removeSession(session);
+
         if (user != null) {
             broadcast("User " + user + " has left the chat");
         }
+    }
+
+    private synchronized void removeUser(String user) {
+        users.remove(user);
+    }
+
+    private synchronized void removeSession(IoSession session) {
+        sessions.remove(session);
     }
 
 

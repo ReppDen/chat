@@ -10,7 +10,7 @@ import java.util.List;
  */
 public class MemoryHistoryManager implements HistoryManager{
 
-    private final List<String> store;
+    private List<String> store;
 
     public MemoryHistoryManager() {
         store = new LinkedList<String>();
@@ -25,7 +25,8 @@ public class MemoryHistoryManager implements HistoryManager{
             throw  new IllegalArgumentException("Count must be bigger than zero");
         }
         int start = store.size() - n >= 0 ? store.size() - n : 0;
-        return store.subList(start,store.size());
+        store = store.subList(start,store.size());
+        return store;
     }
 
     public void clear() {
