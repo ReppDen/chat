@@ -82,7 +82,7 @@ public class LoadTest {
 
                 while (keepWork()) {
                     String msg = "Hi everybody!";
-                    Thread.sleep((Math.abs(new Random().nextInt()) % 20) * 1000);
+                    Thread.sleep((Math.abs(new Random().nextInt()) % 20) * 4000* 1000);
                     c.send(msg);
                 }
                 c.stop();
